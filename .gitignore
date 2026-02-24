@@ -1,0 +1,13 @@
+# R / RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# Quarto tutorial files
+hello.qmd
+hello.html
+hello_files/
+
+# Large original dataset
+LCdata.csv

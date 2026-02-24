@@ -1,0 +1,26 @@
+---
+title: "P1-03"
+format: pdf
+editor: visual
+---
+
+```{r}
+# install the required packages if needed
+if (!require("data.table")) install.packages("data.table")
+if (!require("dplyr")) install.packages("dplyr")
+# load them
+library(data.table)
+library(dplyr)
+```
+
+
+```{r}
+# # Random sample your group's data set from the original LCdata data set
+# LCdata <- fread("LCdata.csv")
+# set.seed(1)
+# myLCdata <- LCdata %>% sample(5) %>% slice_sample(prop = .5)
+# fwrite(myLCdata, file = "myLCdata.csv")
+myLCdata <- fread("myLCdata.csv")
+```
+
+
