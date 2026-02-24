@@ -1,13 +1,19 @@
-# R / RStudio
+# RStudio files (local session / user-specific)
 .Rproj.user/
 .Rhistory
 .RData
 .Ruserdata
 
-# Quarto tutorial files
+# Original large dataset (not needed in repo)
+LCdata.csv
+
+# Quarto tutorial files (not part of project)
 hello.qmd
 hello.html
 hello_files/
 
-# Large original dataset
-LCdata.csv
+# LaTeX intermediate files generated when rendering PDF
+*.tex
+*.log
+*.aux
+*.out

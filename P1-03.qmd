@@ -1,18 +1,31 @@
 ---
-title: "P1-03"
-format: pdf
+title: "TSAR Project Part 1 – Exploratory Data Analysis"
+author: "Kryštof Vávra, Said Fakhri (Group 03)"
+date: today
+format:
+  pdf:
+    number-sections: true
 editor: visual
 ---
 
 ```{r}
-# install the required packages if needed
+#| label: setup
+#| include: false
+#| message: false
+#| warning: false
+
 if (!require("data.table")) install.packages("data.table")
 if (!require("dplyr")) install.packages("dplyr")
-# load them
+if (!require("skimr")) install.packages("skimr")
+if (!require("ggplot2")) install.packages("ggplot2")
+if (!require("GGally")) install.packages("GGally")
+
 library(data.table)
 library(dplyr)
+library(skimr)
+library(ggplot2)
+library(GGally)
 ```
-
 
 ```{r}
 # # Random sample your group's data set from the original LCdata data set
@@ -23,4 +36,316 @@ library(dplyr)
 myLCdata <- fread("myLCdata.csv")
 ```
 
+# Task 1: Business Understanding
 
+```{r}
+#| label: structure-overview
+
+glimpse(myLCdata)
+str(myLCdata)
+```
+
+## Variable Overview and Business Interpretation
+
+The dataset `myLCdata` contains 44,369 observations and 5 variables. Based on the output of `glimpse()` and `str()`, the variables can be categorized as follows:
+
+### Variable Description
+
+-   **annual_inc (numeric)**\
+    The borrower’s self-reported annual income in US dollars. This variable is continuous and measures repayment capacity.
+
+-   **open_acc (integer)**\
+    The number of open credit accounts the borrower currently has. This reflects the borrower’s existing credit exposure.
+
+-   **purpose (character)**\
+    The stated purpose of the loan (e.g., credit card refinancing, debt consolidation, small business, home improvement). This is a categorical variable describing how the borrower intends to use the funds.
+
+-   **home_ownership (character)**\
+    The borrower’s home ownership status (e.g., OWN, RENT, MORTGAGE). This variable provides information about the borrower’s financial stability and asset ownership.
+
+-   **inq_last_6mths (integer)**\
+    The number of credit inquiries made in the last six months. This is an indicator of recent credit-seeking behavior and potential financial stress.
+
+------------------------------------------------------------------------
+
+## Business Context in Peer-to-Peer Lending
+
+In a peer-to-peer lending platform such as Lending Club, investors directly fund loans to borrowers. The platform evaluates borrower characteristics to estimate credit risk.
+
+The variable **annual_inc** is central for assessing repayment ability, as higher income generally implies a greater capacity to service debt.
+
+The variable **open_acc** reflects the borrower’s existing financial obligations. A high number of open accounts may indicate greater financial leverage and potentially higher risk.
+
+The variable **purpose** helps categorize the type of loan demand. For example, debt consolidation loans may indicate existing debt burdens, whereas home improvement loans may reflect investment in property.
+
+The variable **home_ownership** can serve as a proxy for financial stability. Borrowers who own property or have a mortgage may be perceived as more financially stable compared to renters.
+
+Finally, **inq_last_6mths** measures recent credit inquiries. A high number of inquiries can signal increased borrowing activity and may be associated with higher default risk.
+
+Overall, the selected variables capture borrower income, credit exposure, loan motivation, housing stability, and recent credit behavior — all of which are relevant for evaluating creditworthiness in a peer-to-peer lending context.
+
+# Task 2: Data Understanding Based on Summary Statistics
+
+## Summary Statistics
+
+```{r}
+#| label: summary-statistics
+
+summary(myLCdata)
+
+# install skimr if necessary
+if (!require("skimr")) install.packages("skimr")
+library(skimr)
+
+skim(myLCdata)
+```
+
+------------------------------------------------------------------------
+
+## Interpretation and Domain Context
+
+### 1. Missing Values (NAs)
+
+-   Are missing values present?
+-   In which variables?
+-   How many?
+-   Is this plausible from a business perspective?
+-   Would this require data preparation?
+
+**Discussion:** \> Write interpretation here.
+
+------------------------------------------------------------------------
+
+### 2. Numerical Variables
+
+For each numeric/integer variable:
+
+#### Variable: `__________`
+
+-   Mean:
+-   Median:
+-   Minimum:
+-   Maximum:
+-   Standard deviation:
+-   Is the distribution symmetric or skewed?
+-   Are there potential outliers?
+-   Do the extreme values seem realistic in the Lending Club context?
+
+**Statistical Interpretation:** \> Write here.
+
+**Domain Interpretation:** \> Write here.
+
+------------------------------------------------------------------------
+
+### 3. Categorical Variables
+
+For each categorical variable:
+
+#### Variable: `__________`
+
+-   Number of categories:
+-   Most frequent category:
+-   Least frequent category:
+-   Are categories balanced or highly unbalanced?
+-   Does this distribution make business sense?
+
+**Statistical Interpretation:** \> Write here.
+
+**Domain Interpretation:** \> Write here.
+
+------------------------------------------------------------------------
+
+### 4. Key Insights from Summary Statistics
+
+-   Most important statistical findings:
+-   Potential data quality issues:
+-   First hypotheses about borrower behavior:
+
+------------------------------------------------------------------------
+
+# Task 3: Univariate Exploratory Data Analysis (EDA) with ggplot2
+
+## Variable 1: `__________`
+
+### Visualization
+
+```{r}
+#| label: plot-var1
+
+# Insert ggplot code here
+```
+
+### Why This Plot Type?
+
+-   Why is this diagram appropriate for the variable type?
+-   What can be read from this diagram type (e.g., range, distribution, frequency)?
+
+### Interpretation
+
+-   What does the distribution look like?
+-   Are there outliers?
+-   Is the distribution skewed?
+-   What does this imply in the business context?
+-   Does this confirm findings from Task 2?
+
+------------------------------------------------------------------------
+
+## Variable 2: `__________`
+
+### Visualization
+
+```{r}
+#| label: plot-var2
+
+# Insert ggplot code here
+```
+
+### Interpretation
+
+> Write here.
+
+------------------------------------------------------------------------
+
+## Variable 3: `__________`
+
+### Visualization
+
+```{r}
+#| label: plot-var3
+
+# Insert ggplot code here
+```
+
+### Interpretation
+
+> Write here.
+
+------------------------------------------------------------------------
+
+## Variable 4: `__________`
+
+### Visualization
+
+```{r}
+#| label: plot-var4
+
+# Insert ggplot code here
+```
+
+### Interpretation
+
+> Write here.
+
+------------------------------------------------------------------------
+
+## Variable 5: `__________`
+
+### Visualization
+
+```{r}
+#| label: plot-var5
+
+# Insert ggplot code here
+```
+
+### Interpretation
+
+> Write here.
+
+------------------------------------------------------------------------
+
+## Overall Observations from Univariate EDA
+
+-   Which variables show skewness?
+-   Which variables show imbalance?
+-   Any surprising patterns?
+-   Do visual findings confirm summary statistics?
+
+------------------------------------------------------------------------
+
+# Task 4: Bivariate Exploratory Data Analysis (EDA)
+
+## Pairs Plot Overview
+
+```{r}
+#| label: ggpairs-plot
+
+if (!require("GGally")) install.packages("GGally")
+library(GGally)
+
+ggpairs(myLCdata)
+```
+
+### Initial Observations
+
+-   Are there visible correlations?
+-   Any clear patterns?
+-   Any surprising relationships?
+
+------------------------------------------------------------------------
+
+## Selected Insight 1
+
+### Variable Pair: `__________` vs `__________`
+
+### Why This Pair Is Interesting
+
+-   What pattern was observed?
+-   Why was it not obvious before?
+
+### Stand-alone Professional Plot
+
+```{r}
+#| label: custom-plot-1
+
+# Recreate plot using ggplot2
+```
+
+### Interpretation
+
+-   What does this relationship indicate?
+-   Business interpretation?
+
+------------------------------------------------------------------------
+
+## Selected Insight 2
+
+### Variable Pair: `__________` vs `__________`
+
+### Stand-alone Professional Plot
+
+```{r}
+#| label: custom-plot-2
+
+# Recreate plot using ggplot2
+```
+
+### Interpretation
+
+> Write here.
+
+------------------------------------------------------------------------
+
+## Adding a Third Variable
+
+### Enhanced Plot with Third Variable (e.g., color, shape, facet)
+
+```{r}
+#| label: custom-plot-3var
+
+# ggplot with third aesthetic mapping
+```
+
+### Why This Third Variable?
+
+-   Why is it relevant?
+-   What additional insight does it provide?
+-   What was not visible before?
+
+------------------------------------------------------------------------
+
+## Final Bivariate Insights
+
+-   Most important relationships discovered:
+-   Implications for credit risk assessment:
+-   Potential hypotheses for predictive modeling:
