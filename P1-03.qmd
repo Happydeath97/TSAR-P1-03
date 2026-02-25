@@ -52,37 +52,24 @@ The dataset `myLCdata` contains 44,369 observations and 5 variables. Based on th
 ### Variable Description
 
 -   **annual_inc (numeric)**\
-    The borrower’s self-reported annual income in US dollars. This variable is continuous and measures repayment capacity.
+    The self-reported annual income provided by the borrower during registration. This variable is continuous and measures repayment capacity.
 
 -   **open_acc (integer)**\
-    The number of open credit accounts the borrower currently has. This reflects the borrower’s existing credit exposure.
+    The number of open credit lines in the borrower's credit file. This reflects the borrower’s existing credit exposure.
 
 -   **purpose (character)**\
-    The stated purpose of the loan (e.g., credit card refinancing, debt consolidation, small business, home improvement). This is a categorical variable describing how the borrower intends to use the funds.
+    A category provided by the borrower for the loan request. (e.g., credit card refinancing, debt consolidation, small business, home improvement). This is a categorical variable.
 
 -   **home_ownership (character)**\
-    The borrower’s home ownership status (e.g., OWN, RENT, MORTGAGE). This variable provides information about the borrower’s financial stability and asset ownership.
+    The home ownership status provided by the borrower during registration.(e.g., RENT, OWN, MORTGAGE, OTHER).
 
 -   **inq_last_6mths (integer)**\
-    The number of credit inquiries made in the last six months. This is an indicator of recent credit-seeking behavior and potential financial stress.
+    The number of inquiries in past 6 months (excluding auto and mortgage inquiries). This is an indicator of recent credit-seeking behavior and potential financial stress.
 
 ------------------------------------------------------------------------
 
 ## Business Context in Peer-to-Peer Lending
-
-In a peer-to-peer lending platform such as Lending Club, investors directly fund loans to borrowers. The platform evaluates borrower characteristics to estimate credit risk.
-
-The variable **annual_inc** is central for assessing repayment ability, as higher income generally implies a greater capacity to service debt.
-
-The variable **open_acc** reflects the borrower’s existing financial obligations. A high number of open accounts may indicate greater financial leverage and potentially higher risk.
-
-The variable **purpose** helps categorize the type of loan demand. For example, debt consolidation loans may indicate existing debt burdens, whereas home improvement loans may reflect investment in property.
-
-The variable **home_ownership** can serve as a proxy for financial stability. Borrowers who own property or have a mortgage may be perceived as more financially stable compared to renters.
-
-Finally, **inq_last_6mths** measures recent credit inquiries. A high number of inquiries can signal increased borrowing activity and may be associated with higher default risk.
-
-Overall, the selected variables capture borrower income, credit exposure, loan motivation, housing stability, and recent credit behavior — all of which are relevant for evaluating creditworthiness in a peer-to-peer lending context.
+<what to write here??????????>
 
 # Task 2: Data Understanding Based on Summary Statistics
 
