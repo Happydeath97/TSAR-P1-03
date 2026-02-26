@@ -69,7 +69,8 @@ The dataset `myLCdata` contains 44,369 observations and 5 variables. Based on th
 ------------------------------------------------------------------------
 
 ## Business Context in Peer-to-Peer Lending
-<what to write here??????????>
+
+\<what to write here??????????\>
 
 # Task 2: Data Understanding Based on Summary Statistics
 
