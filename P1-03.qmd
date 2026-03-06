@@ -260,7 +260,19 @@ ggplot(myLCdata, aes(x = forcats::fct_infreq(home_ownership)))+
 
 ### Interpretation
 
-> we see that only Mortgage, rent, own are relevant for this attribute. The other values are rarley used. Mortage and rent are most common and ownership comes afterthem with
+> Only the categories mortgage, rent & own are relevant for this feature The other attributes are rarley used. Mortage and rent are used most often. People with home ownership probaly first get a loan by bank with a mortage. In most countries this is the cheapest way to get loans, because property serves as a security. This could be the reason the precentage of the ownership is so low. To best visualize the proportion we could also use a pie chart. 
+
+```{r}
+ggplot(myLCdata, aes(x="",fill = home_ownership))+
+  geom_bar(width = 1, color = "white")+
+  coord_polar("y", start=1)+
+  labs(
+    title = "Distribution of Home Ownership",
+    file = "Home Ownership"
+  )+
+  theme_void()
+```
+
 
 ------------------------------------------------------------------------
 
@@ -269,14 +281,21 @@ ggplot(myLCdata, aes(x = forcats::fct_infreq(home_ownership)))+
 ### Visualization
 
 ```{r}
-#| label: plot-var5
-
-# Insert ggplot code here
+ggplot(myLCdata, aes(x = inq_last_6mths)) +
+  geom_histogram(binwidth = 1) +
+  coord_cartesian(xlim = c(0, 10)) +
+  labs(
+    title = "Credit Inquiries in the Last 6 Months",
+    x = "Number of Inquiries",
+    y = "Count"
+  ) +
+  theme_minimal()
+ 
 ```
 
 ### Interpretation
 
-> Write here.
+> The distribution is highly right-skewed. Most borrowers have zero to a few inquiries, while higher values occur rarely. Therefor the histogram was 
 
 ------------------------------------------------------------------------
 
