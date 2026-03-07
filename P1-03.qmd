@@ -93,67 +93,26 @@ skim(myLCdata)
 
 ## Interpretation and Domain Context
 
-### 1. Missing Values (NAs) -----
+### 1. Missing Values (NAs)
 
--   Are missing values present?
-    -   Categorical values: No missing values
-    -   Numerical values:
-        -   Missing values: 2 tables open_acc, 2 inq_last_6mths
-        -   No missing values: annual_inc
--   Is this plausible from a business perspective?
--   Would this require data preparation?
-    -   Yes, but can be handled by removing the data objects. The risk of distorting of the data is low due to small number of data objects.
-
-**Discussion:**
-
-With such a low number missing values and the total number of data objects of 44369 it the easiest way to handle the missing values is to remove the data objects with missing values. imputation methods require pre calculations which in this case are not worth to do.
+>Missing values are present only in the numerical variables. The categorical variables (purpose and home_ownership) do not contain any missing values. Within the numerical variables, there are two missing values in open_acc and two missing values in inq_last_6mths, while annual_inc contains no missing values.
+This requires a small effort for data preparation. Since only four observations out of a total of 44,369 contain missing values, the simplest and most appropriate approach is to remove these observations from the dataset. Due to the very small number of affected observations, the risk of distorting the dataset or influencing the analysis results is negligible.
 
 ------------------------------------------------------------------------
 
 ### 2. Numerical Variables
 
--   Mean / Median:
-    -   The difference in mean & median seems high in the table inq_last_6mths given the distribution of the 1st Qu and 3rd Qu. This can be explained by the Max which 31 and also an outlier.
--   Minimum:
-    -   The minimum seems reasonable in all the tables
--   Maximum:
-    -   The maximum in annual_inc and inq_last_6mths seem to be outlier. Maybe these data objects can be removed to reduce the distortion in this tables.
--   Standard deviation:
-    -   The std. dev. in the annual_inc table seems too high with a value of 60410. The reason could lay in the outlier of the max which is 6 mio.
--   Is the distribution symmetric or skewed?
-    -   symmetric:
-        -   open_acc
-    -   right skewed:
-        -   annual_inc, inq_last_6mths
--   Are there potential outliers?
-    -   The min of 4000 and max of 6 mio seems to be outliers in the table annual_inc
-    -   The max of 31 in inq_last_6mths seems to be also an outlier
--   Do the extreme values seem realistic in the Lending Club context?
-    -   The outlier of 6 mio in the table annual_inc does not the be realistic in the lending club context. You should expect a person having an income of 6 mio does need a loan from a platform. The other outliers seem to be realistic in this context.
-
-**Statistical Interpretation:** \> Write here.
-
-**Domain Interpretation:** \> Write here.
+>The comparison of the mean and median shows that the variables are not always evenly distributed. For inq_last_6mths, the mean is higher than the median. This is likely caused by the high maximum value of 31, which may be an outlier.
+The minimum values of all numerical variables seem reasonable and do not suggest data errors. However, the maximum values in annual_inc and inq_last_6mths indicate possible outliers. In particular, the maximum annual income of 6,000,000 is very high and likely increases the standard deviation of annual_inc.
+Looking at the distribution, open_acc appears relatively symmetric, while annual_inc and inq_last_6mths are right-skewed because of some very large values.
+From a business perspective, an annual income of 6 million seems unrealistic in the Lending Club context, since people with such a high income would usually not need a loan from this platform. Therefore, this value should be checked and possibly removed. The high value in inq_last_6mths may still be possible but should also be examined as a potential outlier.
 
 ------------------------------------------------------------------------
 
 ### 3. Categorical Variables
 
-For each categorical variable:
-
--   Number of categories:
-    -   purpose: 14
-    -   home_ownership: 6
--   Most frequent category:
-    -   is not readable from the summary or skim table
--   Least frequent category:
-    -   is not readable from the summary or skim table
--   Are categories balanced or highly unbalanced?
-    -   is not readable from the summary or skim table
-
-**Statistical Interpretation:** \> Write here.
-
-**Domain Interpretation:** \> Write here.
+>he dataset contains two categorical variables: purpose and home_ownership. The variable purpose has 14 different categories, while home_ownership has 6 categories.
+Based on the summary or skim output, it is not possible to see which category occurs most frequently or least frequently. It is also not possible to determine whether the categories are balanced or highly unbalanced. To analyze this, additional frequency tables would be needed.
 
 ------------------------------------------------------------------------
 
