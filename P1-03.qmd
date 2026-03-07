@@ -114,13 +114,6 @@ From a business perspective, an annual income of 6 million seems unrealistic in 
 >he dataset contains two categorical variables: purpose and home_ownership. The variable purpose has 14 different categories, while home_ownership has 6 categories.
 Based on the summary or skim output, it is not possible to see which category occurs most frequently or least frequently. It is also not possible to determine whether the categories are balanced or highly unbalanced. To analyze this, additional frequency tables would be needed.
 
-------------------------------------------------------------------------
-
-### 4. Key Insights from Summary Statistics
-
--   Most important statistical findings:
--   Potential data quality issues:
--   First hypotheses about borrower behavior:
 
 ------------------------------------------------------------------------
 
