@@ -25,6 +25,7 @@ library(dplyr)
 library(skimr)
 library(ggplot2)
 library(GGally)
+library(scales)
 ```
 
 ```{r}
@@ -171,22 +172,20 @@ For each categorical variable:
 ### Visualization
 
 ```{r}
-#| label: plot-var1
-
-# Shows distribution of income
-
 ggplot(myLCdata, aes(x = annual_inc)) +
   geom_histogram(bins = 30)
 ```
 
 ### Interpretation:
 
-The annual income variable is extremly right skewed due the small number of extremly high income (e.g. 6 mio income which we detected in task 2). Therefor we need to remove this extreme value:
+> To visualize the annual_inc feature, a histogram was chose because it is suitable for dislaying the distribution of continuous numerical variables
+The distribution of annual income is extremly right-skewed. Most observations lie in the lower income range, while a small number of observations have extremely high income values (e.g., up to approximately 6 million). These extreme values were identified during Task 2.
+Such outliers stretch the scale of the histogram and make it difficult to interpret the distribution of the majority of observations. Therefore, a logarithmic scale was applied to the x-axis. The log transformation compresses large values and spreads smaller values, allowing the overall distribution of incomes to be visualized more clearly.:
 
 ```{r}
-library(scales)
+
 ggplot(myLCdata, aes(x = annual_inc)) +
-  geom_histogram(bins = 30) +
+  geom_histogram(bins = 30, color = "white", fill = "steelblue") +
   scale_x_log10(labels = label_comma()) +
   labs(
     title = "Distriution of Annual Income (log scale)",
@@ -209,11 +208,13 @@ ggplot(myLCdata, aes(x = open_acc))+
 
 ### Interpretation
 
-> This variable is also right skewed. Again we have seen in task 2 that the highest data point is an outlier. but not as clearly as here in this visualization. Most borrowers have between 5 and 15 (Task 2) open accounts, while a small number of borrowers have significantly more accounts. We have then changed it to histogram and excluded the outliers:
+> To visualize the open_acc variable, a histogram was used because it represents a numerical count variable.
+The distribution is right-skewed, meaning that most borrowers have a relatively small number of open credit accounts, while a smaller number of borrowers have a significantly higher number of accounts. As identified in Task 2, the highest value represents an outlier.
+Most borrowers have between approximately 5 and 15 open accounts, which represents the main concentration of the data. To better illustrate this distribution and improve readability, the histogram focuses on the relevant range of the data  (0-30) to cancel the influence of extreme values.:
 
 ```{r}
 ggplot(myLCdata, aes(x = open_acc)) +
-  geom_histogram(binwidth = 1, fill = "steelblue") +
+  geom_histogram(binwidth = 1, fill = "steelblue", color = "white") +
   coord_cartesian(xlim = c(0, 30)) +
   labs(
     title = "Distribution of Open Credit Accounts",
@@ -242,7 +243,9 @@ ggplot(myLCdata, aes(x = forcats::fct_infreq(purpose))) +
 
 ### Interpretation
 
-## \> In this chart we see clearly see that the purpose for most of the loans debt consolidation is. WE have read in the description of the task that the this site offers more competitive loans because it is a peer to peer credit marketplace. This leds to the assumption, that people try to consilidate their debts with cheaper loans on this side as descripted in the task introduciton.
+> To visualize the purpose variable, a bar chart was used. The chart shows the number of loans for each loan purpose.
+The visualization indicates that debt consolidation is by far the most common reason for taking a loan on the platform. The second most common purpose is credit card repayment, followed by home improvement and other smaller categories.
+According to the task description, the platform is a peer-to-peer lending marketplace that may offer more competitive loan conditions compared to traditional lenders. This may explain why many borrowers use the platform to consolidate existing debts into a single loan with potentially better terms. Credit Cards supplier are also known for their extrem interest. 
 
 ## Variable 4: `home_ownership`
 
@@ -260,7 +263,9 @@ ggplot(myLCdata, aes(x = forcats::fct_infreq(home_ownership)))+
 
 ### Interpretation
 
-> Only the categories mortgage, rent & own are relevant for this feature The other attributes are rarley used. Mortage and rent are used most often. People with home ownership probaly first get a loan by bank with a mortage. In most countries this is the cheapest way to get loans, because property serves as a security. This could be the reason the precentage of the ownership is so low. To best visualize the proportion we could also use a pie chart. 
+> To visualize the home_ownership variable, a pie chart was used because it shows the proportion of observations within a categorical variable.
+The chart shows that the most common categories are mortgage and rent, while a smaller proportion of borrowers own their homes outright. The remaining categories (such as ANY, NONE, and OTHER) appear only rarely and therefore represent a small share of the dataset.
+One possible explanation for the relatively small proportion of borrowers who fully own their homes is that homeowners may have easier access to traditional bank loans, as property can serve as collateral. As a result, they may rely less on peer-to-peer lending platforms compared to individuals who rent or still have a mortgage. Interesting to note is, that on the feature "purpose" home improvements were at third place. Here ownership of home is also on the third place. This may indicate that some homeowners use loans on the platform to finance improvements or renovations.
 
 ```{r}
 ggplot(myLCdata, aes(x="",fill = home_ownership))+
@@ -274,6 +279,37 @@ ggplot(myLCdata, aes(x="",fill = home_ownership))+
 ```
 
 
+```{r}
+
+ggplot(myLCdata, aes (x = forcats::fct_infreq(purpose), fill = home_ownership)) +
+  geom_bar()+
+  labs(
+    title = "Purpose vs. Home ownership in absolute relation",
+    x = "Purpose of loan",
+    y = "Count",
+    fill = "Home Ownership"
+  )+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r}
+ggplot(myLCdata, aes (x = forcats::fct_infreq(purpose), fill = home_ownership)) +
+  geom_bar( position = "fill")+
+  labs(
+    title = "Purpose vs. Home Ownership in relative Relation",
+    x = "Purpose of loan",
+    y = "Count",
+    fill = "Home Ownership"
+  )+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+> my thesis was wrong...
+People who have given as the purpose the reason "home_improvement" have as a majority a mortagege
+
 ------------------------------------------------------------------------
 
 ## Variable 5: `inq_last_6mths`
@@ -282,7 +318,7 @@ ggplot(myLCdata, aes(x="",fill = home_ownership))+
 
 ```{r}
 ggplot(myLCdata, aes(x = inq_last_6mths)) +
-  geom_histogram(binwidth = 1) +
+  geom_histogram(binwidth = 1, fill = "steelblue", color = "white") +
   coord_cartesian(xlim = c(0, 10)) +
   labs(
     title = "Credit Inquiries in the Last 6 Months",
@@ -295,7 +331,8 @@ ggplot(myLCdata, aes(x = inq_last_6mths)) +
 
 ### Interpretation
 
-> The distribution is highly right-skewed. Most borrowers have zero to a few inquiries, while higher values occur rarely. Therefor the histogram was 
+>A histogram was chosen for this feature because it  shows the frequency distribution and highlights the strong concentration of observations at low values. Here we cannot use log scale because the values are to little. 
+The distribution of credit inquiries in the last 6 months is highly right-skewed. Most borrowers have zero or only a few inquiries, while higher numbers of inquiries occur very rarely. This results in a long tail on the right side of the distribution.
 
 ------------------------------------------------------------------------
 
