@@ -71,7 +71,15 @@ The dataset `myLCdata` contains 44,369 observations and 5 variables. Based on th
 
 ## Business Context in Peer-to-Peer Lending
 
-\<what to write here??????????\>
+- **annual_inc**: In a peer-to-peer lending context, annual income is important because it helps indicate the borrower’s repayment capacity and overall financial strength.
+
+- **open_acc**: In peer-to-peer lending, the number of open credit accounts provides insight into the borrower’s existing credit exposure and current debt management behavior.
+
+- **purpose**: In a peer-to-peer lending setting, the loan purpose is relevant because different borrowing purposes may be associated with different risk levels and repayment patterns.
+
+- **home_ownership**: In peer-to-peer lending, home ownership status can serve as a proxy for financial stability and may help differentiate borrower risk profiles.
+
+- **inq_last_6mths**: In a peer-to-peer lending context, the number of recent credit inquiries is useful because frequent inquiries may indicate higher credit demand, financial stress, or increased default risk.
 
 # Task 2: Data Understanding Based on Summary Statistics
 
@@ -307,32 +315,41 @@ The distribution of credit inquiries in the last 6 months is highly right-skewed
 if (!require("GGally")) install.packages("GGally")
 library(GGally)
 
+# droping 2 NA rows to avoid a lot of warning messages
+myLCdata <- na.omit(myLCdata)
 ggpairs(myLCdata)
 ```
 
-### Initial Observations
+### Initial Observations from the Pair Plot
 
--   Are there visible correlations?
--   Any clear patterns?
--   Any surprising relationships?
-
+The pair plot does not reveal any strong bivariate relationships, but it does suggest a few weak and potentially meaningful patterns between variable pairs. Among the numerical variables, `annual_inc` and `open_acc` show a weak positive association, while `open_acc` and `inq_last_6mths` also appear to have a slight positive relationship. In contrast, `annual_inc` and `inq_last_6mths` show almost no visible association. The pair plot also suggests that the relationship between numerical and categorical variables may differ across groups, particularly for combinations involving `home_ownership` and `purpose`, where the distributions of `annual_inc` and `open_acc` appear to vary between categories. Overall, the main insight from the pair plot is that the dataset contains weak relationships rather than strong correlations, and that some group-based differences may be worth exploring further with stand-alone ggplot visualizations.
 ------------------------------------------------------------------------
 
 ## Selected Insight 1
 
-### Variable Pair: `__________` vs `__________`
+### Variable Pair: `annual_inc` vs `open_acc`
 
 ### Why This Pair Is Interesting
 
--   What pattern was observed?
--   Why was it not obvious before?
+I see weak positive relationship between annual_inc and open_acc (Corr: 0.151***). That means borrowers with higher annual income may tend to have slightly more open credit accounts, but the relationship is not strong. This is worth exploring further because such a pattern was not visible before.
 
 ### Stand-alone Professional Plot
 
 ```{r}
-#| label: custom-plot-1
+#| label: insight1-annual-inc-open-acc
+#| fig-width: 9
+#| fig-height: 5.5
 
-# Recreate plot using ggplot2
+
+ggplot(myLCdata, aes(x = annual_inc, y = open_acc)) +
+  geom_point(alpha = 0.1) +
+  scale_x_log10() +
+  labs(
+    title = "Annual Income vs Open Credit Accounts",
+    x = "Annual Income (log scale)",
+    y = "Number of Open Credit Accounts"
+  ) +
+  theme_minimal()
 ```
 
 ### Interpretation
@@ -344,7 +361,7 @@ ggpairs(myLCdata)
 
 ## Selected Insight 2
 
-### Variable Pair: `__________` vs `__________`
+### Variable Pair: `home_ownership` vs `annual_inc`
 
 ### Stand-alone Professional Plot
 
