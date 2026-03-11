@@ -366,9 +366,19 @@ ggplot(myLCdata, aes(x = annual_inc, y = open_acc)) +
 ### Stand-alone Professional Plot
 
 ```{r}
-#| label: custom-plot-2
+#| label: Relation Home ownership vs. annual income
 
-# Recreate plot using ggplot2
+ggplot(myLCdata, aes(x = home_ownership, y = annual_inc,)+
+  geom_boxplot(fill = "steelblue", color = "blue", outlier.alpha = 0.5)+
+  scale_y_log10()+
+  labs(
+    title = "Home ownership vs.annual income",
+    x = "home ownership",
+    y = "annual income"
+  )
+  
+  
+  
 ```
 
 ### Interpretation
