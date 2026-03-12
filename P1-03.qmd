@@ -311,14 +311,12 @@ The distribution of credit inquiries in the last 6 months is highly right-skewed
 
 ```{r}
 #| label: ggpairs-plot
-
-if (!require("GGally")) install.packages("GGally")
-library(GGally)
-
 # droping 2 NA rows to avoid a lot of warning messages
-myLCdata <- na.omit(myLCdata)
-myLCdata$annual_inc <- log(myLCdata$annual_inc)
-ggpairs(myLCdata)
+myLCdata_pairs <- myLCdata[myLCdata$home_ownership %in% c("OWN", "MORTGAGE", "RENT"), ]
+myLCdata_pairs <- na.omit(myLCdata_pairs)
+myLCdata_pairs$annual_inc <- log(myLCdata_pairs$annual_inc)
+
+ggpairs(myLCdata_pairs)
 ```
 
 ### Initial Observations from the Pair Plot
@@ -369,48 +367,40 @@ ggplot(myLCdata, aes(x = annual_inc, y = open_acc)) +
 ```{r}
 #| label: Relation Home ownership vs. annual income
 
+
+# compute quartiles and median
+stats <- subset(myLCdata, annual_inc <= 300000 &
+                !home_ownership %in% c("OTHER","ANY","NONE")) %>%
+  group_by(home_ownership) %>%
+  summarise(
+    Q1 = quantile(annual_inc, 0.25),
+    Median = median(annual_inc),
+    Q3 = quantile(annual_inc, 0.75)
+  )
+
 ggplot(
-  subset(myLCdata[myLCdata$annual_inc <= 300000], !home_ownership %in% c("OTHER", "ANY", "NONE")),
+  subset(myLCdata, annual_inc <= 300000 &
+                  !home_ownership %in% c("OTHER","ANY","NONE")),
   aes(x = home_ownership, y = annual_inc)
 ) +
   geom_boxplot(fill = "steelblue", color = "blue", outlier.alpha = 0.5) +
+  geom_text(data = stats, aes(y = Median, label = round(Median)), vjust = -0.5, color = "red") +
+  geom_text(data = stats, aes(y = Q1, label = round(Q1)), vjust = 1.5, color = "black") +
+  geom_text(data = stats, aes(y = Q3, label = round(Q3)), vjust = -0.5, color = "black") +
   scale_y_log10(
-    breaks = c(10000, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 250000, 300000)
+    breaks = c(10000, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 300000)
   ) +
   labs(
     title = "Home ownership vs. annual income",
     x = "home ownership",
     y = "annual income"
-  )
-  
+  )  
 ```
 
 ### Interpretation
 
-> For interpretation the two features home ownership and annual income have been chosen. This because we wanted to see if there is 
-
-------------------------------------------------------------------------
-
-## Adding a Third Variable
-
-### Enhanced Plot with Third Variable (e.g., color, shape, facet)
-
-```{r}
-#| label: custom-plot-3var
-
-# ggplot with third aesthetic mapping
-```
-
-### Why This Third Variable?
-
--   Why is it relevant?
--   What additional insight does it provide?
--   What was not visible before?
-
-------------------------------------------------------------------------
-
-## Final Bivariate Insights
-
--   Most important relationships discovered:
--   Implications for credit risk assessment:
--   Potential hypotheses for predictive modeling:
+> home ownership and annual income were analyzed using a boxplot to compare income distributions across different housing situations. To make interpretation easier the categories OTHER, ANY, None have been removed since it is not relevant and they appear at most just a dozen times together. 
+The plot shows that individuals with a mortgage have the highest median annual income (≈73,000). This is noticeably higher than both homeowners without a mortgage (≈56,000) and renters (≈55,000).
+A explanation could be that people who take on a mortgage often have higher and more stable incomes, since banks require sufficient income to approve a mortgage.
+Surprising is, that individuals who own their home have a similar income distribution to renters, with almost identical median incomes.A explanation could be that typically elderly people own their own home because they had more time to pay off their debt. this means that they just receive their rent, which is usually lower than a normal income (atleast in switzerland)
+Overall, the boxplot suggests that having a mortgage is associated with higher income, while owning a home outright does not necessarily imply higher current income compared to renting.
