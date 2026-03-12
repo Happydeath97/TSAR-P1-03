@@ -317,6 +317,7 @@ library(GGally)
 
 # droping 2 NA rows to avoid a lot of warning messages
 myLCdata <- na.omit(myLCdata)
+myLCdata$annual_inc <- log(myLCdata$annual_inc)
 ggpairs(myLCdata)
 ```
 
@@ -368,11 +369,13 @@ ggplot(myLCdata, aes(x = annual_inc, y = open_acc)) +
 ```{r}
 #| label: Relation Home ownership vs. annual income
 
-ggplot(myLCdata[myLCdata$annual_inc <= 300000, ],
-       aes(x = home_ownership, y = annual_inc)) +
+ggplot(
+  subset(myLCdata[myLCdata$annual_inc <= 300000], !home_ownership %in% c("OTHER", "ANY", "NONE")),
+  aes(x = home_ownership, y = annual_inc)
+) +
   geom_boxplot(fill = "steelblue", color = "blue", outlier.alpha = 0.5) +
   scale_y_log10(
-    breaks = c (10000, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 250000, 300000)
+    breaks = c(10000, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 250000, 300000)
   ) +
   labs(
     title = "Home ownership vs. annual income",
@@ -380,13 +383,11 @@ ggplot(myLCdata[myLCdata$annual_inc <= 300000, ],
     y = "annual income"
   )
   
-  
-  
 ```
 
 ### Interpretation
 
-> Write here.
+> For interpretation the two features home ownership and annual income have been chosen. This because we wanted to see if there is 
 
 ------------------------------------------------------------------------
 
