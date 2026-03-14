@@ -69,7 +69,7 @@ The dataset `myLCdata` contains 44,369 observations and 5 variables. Based on th
 
 ------------------------------------------------------------------------
 
-## Business Context in Peer-to-Peer Lending
+### Business Context in Peer-to-Peer Lending
 
 -   **annual_inc**: In a peer-to-peer lending context, annual income is important because it helps indicate the borrower’s repayment capacity and overall financial strength.
 
@@ -101,23 +101,23 @@ skim(myLCdata)
 
 ## Interpretation and Domain Context
 
-### 1. Missing Values (NAs)
+### Missing Values (NAs)
 
 > Missing values are present only in the numerical variables. The categorical variables (purpose and home_ownership) do not contain any missing values. Within the numerical variables, there are two missing values in open_acc and two missing values in inq_last_6mths, while annual_inc contains no missing values. This requires a small effort for data preparation. Since only four observations out of a total of 44,369 contain missing values, the simplest and most appropriate approach is to remove these observations from the dataset. Due to the very small number of affected observations, the risk of distorting the dataset or influencing the analysis results is negligible.
 
 ------------------------------------------------------------------------
 
-### 2. Numerical Variables
+### Numerical Variables
 
 > The comparison of the mean and median shows that the variables are not always evenly distributed. For inq_last_6mths, the mean is higher than the median. This is likely caused by the high maximum value of 31, which may be an outlier. The minimum values of all numerical variables seem reasonable and do not suggest data errors. However, the maximum values in annual_inc and inq_last_6mths indicate possible outliers. In particular, the maximum annual income of 6,000,000 is very high and likely increases the standard deviation of annual_inc. Looking at the distribution, open_acc appears relatively symmetric, while annual_inc and inq_last_6mths are right-skewed because of some very large values. From a business perspective, an annual income of 6 million seems unrealistic in the Lending Club context, since people with such a high income would usually not need a loan from this platform. Therefore, this value should be checked and possibly removed. The high value in inq_last_6mths may still be possible but should also be examined as a potential outlier.
 
 ------------------------------------------------------------------------
 
-### 3. Categorical Variables
+### Categorical Variables
 
-> the dataset contains two categorical variables: purpose and home_ownership. The variable purpose has 14 different categories, while home_ownership has 6 categories. Based on the summary or skim output, it is not possible to see which category occurs most frequently or least frequently. It is also not possible to determine whether the categories are balanced or highly unbalanced. To analyze this, additional frequency tables would be needed.
+> The dataset contains two categorical variables: purpose and home_ownership. The variable purpose has 14 different categories, while home_ownership has 6 categories. Based on the summary or skim output, it is not possible to see which category occurs most frequently or least frequently. It is also not possible to determine whether the categories are balanced or highly unbalanced. To analyze this, additional frequency tables would be needed.
 
-## \>the feature has 6 categories and not 4 like in the dictionary described.
+> The feature home_ownership has 6 categories and not 4 like in the dictionary described.On how to proceed with this information we decided to ignore the 2 extra categories since the number of occurences is relatively small in comparison with the full size of the dataset.
 
 # Task 3: Univariate Exploratory Data Analysis (EDA) with ggplot2
 
