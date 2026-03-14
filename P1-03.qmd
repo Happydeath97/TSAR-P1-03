@@ -71,15 +71,15 @@ The dataset `myLCdata` contains 44,369 observations and 5 variables. Based on th
 
 ## Business Context in Peer-to-Peer Lending
 
-- **annual_inc**: In a peer-to-peer lending context, annual income is important because it helps indicate the borrower’s repayment capacity and overall financial strength.
+-   **annual_inc**: In a peer-to-peer lending context, annual income is important because it helps indicate the borrower’s repayment capacity and overall financial strength.
 
-- **open_acc**: In peer-to-peer lending, the number of open credit accounts provides insight into the borrower’s existing credit exposure and current debt management behavior.
+-   **open_acc**: In peer-to-peer lending, the number of open credit accounts provides insight into the borrower’s existing credit exposure and current debt management behavior.
 
-- **purpose**: In a peer-to-peer lending setting, the loan purpose is relevant because different borrowing purposes may be associated with different risk levels and repayment patterns.
+-   **purpose**: In a peer-to-peer lending setting, the loan purpose is relevant because different borrowing purposes may be associated with different risk levels and repayment patterns.
 
-- **home_ownership**: In peer-to-peer lending, home ownership status can serve as a proxy for financial stability and may help differentiate borrower risk profiles.
+-   **home_ownership**: In peer-to-peer lending, home ownership status can serve as a proxy for financial stability and may help differentiate borrower risk profiles.
 
-- **inq_last_6mths**: In a peer-to-peer lending context, the number of recent credit inquiries is useful because frequent inquiries may indicate higher credit demand, financial stress, or increased default risk.
+-   **inq_last_6mths**: In a peer-to-peer lending context, the number of recent credit inquiries is useful because frequent inquiries may indicate higher credit demand, financial stress, or increased default risk.
 
 # Task 2: Data Understanding Based on Summary Statistics
 
@@ -103,27 +103,21 @@ skim(myLCdata)
 
 ### 1. Missing Values (NAs)
 
->Missing values are present only in the numerical variables. The categorical variables (purpose and home_ownership) do not contain any missing values. Within the numerical variables, there are two missing values in open_acc and two missing values in inq_last_6mths, while annual_inc contains no missing values.
-This requires a small effort for data preparation. Since only four observations out of a total of 44,369 contain missing values, the simplest and most appropriate approach is to remove these observations from the dataset. Due to the very small number of affected observations, the risk of distorting the dataset or influencing the analysis results is negligible.
+> Missing values are present only in the numerical variables. The categorical variables (purpose and home_ownership) do not contain any missing values. Within the numerical variables, there are two missing values in open_acc and two missing values in inq_last_6mths, while annual_inc contains no missing values. This requires a small effort for data preparation. Since only four observations out of a total of 44,369 contain missing values, the simplest and most appropriate approach is to remove these observations from the dataset. Due to the very small number of affected observations, the risk of distorting the dataset or influencing the analysis results is negligible.
 
 ------------------------------------------------------------------------
 
 ### 2. Numerical Variables
 
->The comparison of the mean and median shows that the variables are not always evenly distributed. For inq_last_6mths, the mean is higher than the median. This is likely caused by the high maximum value of 31, which may be an outlier.
-The minimum values of all numerical variables seem reasonable and do not suggest data errors. However, the maximum values in annual_inc and inq_last_6mths indicate possible outliers. In particular, the maximum annual income of 6,000,000 is very high and likely increases the standard deviation of annual_inc.
-Looking at the distribution, open_acc appears relatively symmetric, while annual_inc and inq_last_6mths are right-skewed because of some very large values.
-From a business perspective, an annual income of 6 million seems unrealistic in the Lending Club context, since people with such a high income would usually not need a loan from this platform. Therefore, this value should be checked and possibly removed. The high value in inq_last_6mths may still be possible but should also be examined as a potential outlier.
+> The comparison of the mean and median shows that the variables are not always evenly distributed. For inq_last_6mths, the mean is higher than the median. This is likely caused by the high maximum value of 31, which may be an outlier. The minimum values of all numerical variables seem reasonable and do not suggest data errors. However, the maximum values in annual_inc and inq_last_6mths indicate possible outliers. In particular, the maximum annual income of 6,000,000 is very high and likely increases the standard deviation of annual_inc. Looking at the distribution, open_acc appears relatively symmetric, while annual_inc and inq_last_6mths are right-skewed because of some very large values. From a business perspective, an annual income of 6 million seems unrealistic in the Lending Club context, since people with such a high income would usually not need a loan from this platform. Therefore, this value should be checked and possibly removed. The high value in inq_last_6mths may still be possible but should also be examined as a potential outlier.
 
 ------------------------------------------------------------------------
 
 ### 3. Categorical Variables
 
->the dataset contains two categorical variables: purpose and home_ownership. The variable purpose has 14 different categories, while home_ownership has 6 categories.
-Based on the summary or skim output, it is not possible to see which category occurs most frequently or least frequently. It is also not possible to determine whether the categories are balanced or highly unbalanced. To analyze this, additional frequency tables would be needed.
+> the dataset contains two categorical variables: purpose and home_ownership. The variable purpose has 14 different categories, while home_ownership has 6 categories. Based on the summary or skim output, it is not possible to see which category occurs most frequently or least frequently. It is also not possible to determine whether the categories are balanced or highly unbalanced. To analyze this, additional frequency tables would be needed.
 
->the feature has 6 categories and not 4 like in the dictionary described.  
-------------------------------------------------------------------------
+## \>the feature has 6 categories and not 4 like in the dictionary described.
 
 # Task 3: Univariate Exploratory Data Analysis (EDA) with ggplot2
 
@@ -138,9 +132,7 @@ ggplot(myLCdata, aes(x = annual_inc)) +
 
 ### Interpretation:
 
-> To visualize the annual_inc feature, a histogram was chose because it is suitable for dislaying the distribution of continuous numerical variables
-The distribution of annual income is extremly right-skewed. Most observations lie in the lower income range, while a small number of observations have extremely high income values (e.g., up to approximately 6 million). These extreme values were identified during Task 2.
-Such outliers stretch the scale of the histogram and make it difficult to interpret the distribution of the majority of observations. Therefore, a logarithmic scale was applied to the x-axis. The log transformation compresses large values and spreads smaller values, allowing the overall distribution of incomes to be visualized more clearly.:
+> To visualize the annual_inc feature, a histogram was chose because it is suitable for dislaying the distribution of continuous numerical variables The distribution of annual income is extremly right-skewed. Most observations lie in the lower income range, while a small number of observations have extremely high income values (e.g., up to approximately 6 million). These extreme values were identified during Task 2. Such outliers stretch the scale of the histogram and make it difficult to interpret the distribution of the majority of observations. Therefore, a logarithmic scale was applied to the x-axis. The log transformation compresses large values and spreads smaller values, allowing the overall distribution of incomes to be visualized more clearly.:
 
 ```{r}
 
@@ -168,9 +160,7 @@ ggplot(myLCdata, aes(x = open_acc))+
 
 ### Interpretation
 
-> To visualize the open_acc variable, a histogram was used because it represents a numerical count variable.
-The distribution is right-skewed, meaning that most borrowers have a relatively small number of open credit accounts, while a smaller number of borrowers have a significantly higher number of accounts. As identified in Task 2, the highest value represents an outlier.
-Most borrowers have between approximately 5 and 15 open accounts, which represents the main concentration of the data. To better illustrate this distribution and improve readability, the histogram focuses on the relevant range of the data  (0-30) to cancel the influence of extreme values.:
+> To visualize the open_acc variable, a histogram was used because it represents a numerical count variable. The distribution is right-skewed, meaning that most borrowers have a relatively small number of open credit accounts, while a smaller number of borrowers have a significantly higher number of accounts. As identified in Task 2, the highest value represents an outlier. Most borrowers have between approximately 5 and 15 open accounts, which represents the main concentration of the data. To better illustrate this distribution and improve readability, the histogram focuses on the relevant range of the data (0-30) to cancel the influence of extreme values.:
 
 ```{r}
 ggplot(myLCdata, aes(x = open_acc)) +
@@ -203,9 +193,7 @@ ggplot(myLCdata, aes(x = forcats::fct_infreq(purpose))) +
 
 ### Interpretation
 
-> To visualize the purpose variable, a bar chart was used. The chart shows the number of loans for each loan purpose.
-The visualization indicates that debt consolidation is by far the most common reason for taking a loan on the platform. The second most common purpose is credit card repayment, followed by home improvement and other smaller categories.
-According to the task description, the platform is a peer-to-peer lending marketplace that may offer more competitive loan conditions compared to traditional lenders. This may explain why many borrowers use the platform to consolidate existing debts into a single loan with potentially better terms. Credit Cards supplier are also known for their extrem interest. 
+> To visualize the purpose variable, a bar chart was used. The chart shows the number of loans for each loan purpose. The visualization indicates that debt consolidation is by far the most common reason for taking a loan on the platform. The second most common purpose is credit card repayment, followed by home improvement and other smaller categories. According to the task description, the platform is a peer-to-peer lending marketplace that may offer more competitive loan conditions compared to traditional lenders. This may explain why many borrowers use the platform to consolidate existing debts into a single loan with potentially better terms. Credit Cards supplier are also known for their extrem interest.
 
 ## Variable 4: `home_ownership`
 
@@ -223,9 +211,7 @@ ggplot(myLCdata, aes(x = forcats::fct_infreq(home_ownership)))+
 
 ### Interpretation
 
-> To visualize the home_ownership variable, a pie chart was used because it shows the proportion of observations within a categorical variable.
-The chart shows that the most common categories are mortgage and rent, while a smaller proportion of borrowers own their homes outright. The remaining categories (such as ANY, NONE, and OTHER) appear only rarely and therefore represent a small share of the dataset.
-One possible explanation for the relatively small proportion of borrowers who fully own their homes is that homeowners may have easier access to traditional bank loans, as property can serve as collateral. As a result, they may rely less on peer-to-peer lending platforms compared to individuals who rent or still have a mortgage. Interesting to note is, that on the feature "purpose" home improvements were at third place. Here ownership of home is also on the third place. This may indicate that some homeowners use loans on the platform to finance improvements or renovations.
+> To visualize the home_ownership variable, a pie chart was used because it shows the proportion of observations within a categorical variable. The chart shows that the most common categories are mortgage and rent, while a smaller proportion of borrowers own their homes outright. The remaining categories (such as ANY, NONE, and OTHER) appear only rarely and therefore represent a small share of the dataset. One possible explanation for the relatively small proportion of borrowers who fully own their homes is that homeowners may have easier access to traditional bank loans, as property can serve as collateral. As a result, they may rely less on peer-to-peer lending platforms compared to individuals who rent or still have a mortgage. Interesting to note is, that on the feature "purpose" home improvements were at third place. Here ownership of home is also on the third place. This may indicate that some homeowners use loans on the platform to finance improvements or renovations.
 
 ```{r}
 ggplot(myLCdata, aes(x="",fill = home_ownership))+
@@ -237,7 +223,6 @@ ggplot(myLCdata, aes(x="",fill = home_ownership))+
   )+
   theme_void()
 ```
-
 
 ```{r}
 
@@ -267,8 +252,7 @@ ggplot(myLCdata, aes (x = forcats::fct_infreq(purpose), fill = home_ownership)) 
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-> my thesis was wrong...
-People who have given as the purpose the reason "home_improvement" have as a majority a mortagege
+> my thesis was wrong... People who have given as the purpose the reason "home_improvement" have as a majority a mortagege
 
 ------------------------------------------------------------------------
 
@@ -291,8 +275,7 @@ ggplot(myLCdata, aes(x = inq_last_6mths)) +
 
 ### Interpretation
 
->A histogram was chosen for this feature because it  shows the frequency distribution and highlights the strong concentration of observations at low values. Here we cannot use log scale because the values are to little. 
-The distribution of credit inquiries in the last 6 months is highly right-skewed. Most borrowers have zero or only a few inquiries, while higher numbers of inquiries occur very rarely. This results in a long tail on the right side of the distribution.
+> A histogram was chosen for this feature because it shows the frequency distribution and highlights the strong concentration of observations at low values. Here we cannot use log scale because the values are to little. The distribution of credit inquiries in the last 6 months is highly right-skewed. Most borrowers have zero or only a few inquiries, while higher numbers of inquiries occur very rarely. This results in a long tail on the right side of the distribution.
 
 ------------------------------------------------------------------------
 
@@ -321,8 +304,25 @@ ggpairs(myLCdata_pairs)
 
 ### Initial Observations from the Pair Plot
 
-The pair plot does not reveal any strong bivariate relationships, but it does suggest a few weak and potentially meaningful patterns between variable pairs. Among the numerical variables, `annual_inc` and `open_acc` show a weak positive association, while `open_acc` and `inq_last_6mths` also appear to have a slight positive relationship. In contrast, `annual_inc` and `inq_last_6mths` show almost no visible association. The pair plot also suggests that the relationship between numerical and categorical variables may differ across groups, particularly for combinations involving `home_ownership` and `purpose`, where the distributions of `annual_inc` and `open_acc` appear to vary between categories. Overall, the main insight from the pair plot is that the dataset contains weak relationships rather than strong correlations, and that some group-based differences may be worth exploring further with stand-alone ggplot visualizations.
-------------------------------------------------------------------------
+-   `annual_inc` and `open_acc` show a **weak positive association**. Higher income tends to be linked with slightly more open accounts, although the relationship remains weak.
+
+-   `annual_inc` and `inq_last_6mths` show **almost no meaningful relationship**. Income does not appear to vary systematically with the number of recent inquiries.
+
+-   `open_acc` and `inq_last_6mths` show a **weak positive relationship**, but the pattern does not seem very meaningful.
+
+-   `annual_inc` across `purpose` shows **moderate differences between categories**. Some loan purposes appear associated with slightly higher typical income levels than others.
+
+-   `open_acc` across `purpose` also shows **some variation between categories**, suggesting that the number of open accounts differs somewhat depending on loan purpose.
+
+-   `inq_last_6mths` across `purpose` appears **fairly similar across most categories**, with most observations concentrated at low values and only a few more extreme cases.
+
+-   `annual_inc` across `home_ownership` shows **clear differences between groups**. Some home ownership categories appear associated with higher typical income levels than others.
+
+-   `open_acc` across `home_ownership` shows **moderate separation between groups**, indicating that home ownership status may be associated with the number of open accounts.
+
+-   `inq_last_6mths` across `home_ownership` shows **almost no differences between groups**, since most groups remain concentrated near very low inquiry counts.
+
+-   `purpose` and `home_ownership` do not show a single simple visual pattern together, but some category combinations appear more frequent than others, suggesting an **uneven distribution of cases across groups**.
 
 ## Selected Insight 1
 
@@ -330,7 +330,7 @@ The pair plot does not reveal any strong bivariate relationships, but it does su
 
 ### Why This Pair Is Interesting
 
-I see weak positive relationship between annual_inc and open_acc (Corr: 0.151***). That means borrowers with higher annual income may tend to have slightly more open credit accounts, but the relationship is not strong. This is worth exploring further because such a pattern was not visible before.
+We want to explore whether the positive relationship between `annual_inc` and `open_acc` is genuinely present in the data or whether it is mainly driven by a small number of extreme income values. We also want to see the overall shape, spread, and possible clustering of the observations more clearly than in the full `ggpairs()` matrix.
 
 ### Stand-alone Professional Plot
 
@@ -341,26 +341,73 @@ I see weak positive relationship between annual_inc and open_acc (Corr: 0.151***
 
 
 ggplot(myLCdata, aes(x = annual_inc, y = open_acc)) +
-  geom_point(alpha = 0.1) +
+  geom_point(alpha = 0.15, size = 1.2) +
   scale_x_log10() +
   labs(
-    title = "Annual Income vs Open Credit Accounts",
-    x = "Annual Income (log scale)",
-    y = "Number of Open Credit Accounts"
+    title = "Annual Income vs Open Accounts",
+    subtitle = "Scatterplot with log-scaled income",
+    x = "Annual income (log scale)",
+    y = "Number of open accounts"
   ) +
   theme_minimal()
 ```
 
 ### Interpretation
 
--   What does this relationship indicate?
--   Business interpretation?
+-   The scatterplot shows a weak positive association between `annual_inc` and `open_acc`, but the relationship is not very clear. Most observations are heavily concentrated in one region, and the large number of overlapping points makes it difficult to see the true structure of the data. For this reason, we want to create a second plot that shows the concentration of observations more clearly.
 
-------------------------------------------------------------------------
+```{r}
+ggplot(myLCdata, aes(x = annual_inc, y = open_acc)) +
+  geom_bin2d(bins = 25) +
+  scale_x_log10() +
+  labs(
+    title = "Annual Income vs Open Accounts",
+    subtitle = "2D bin plot with log-scaled income",
+    x = "Annual income (log scale)",
+    y = "Number of open accounts",
+    fill = "Count"
+  ) +
+  theme_minimal()
+```
+
+-   While the scatterplot suggested a possible weak positive relationship, the 2D bin plot confirms that this pattern is also visible in the main concentration of the data and is not only caused by a few outliers. However, the relationship still appears weak, since the data remain widely spread and no strong trend is visible. Maybe the pattern would be more visible if we add a third variable home_ownership.
+
+```{r}
+library(dplyr)
+
+loan_filtered <- myLCdata %>%
+  filter(home_ownership %in% c("MORTGAGE", "OWN", "RENT", "OTHER"))
+
+ggplot(loan_filtered, aes(x = annual_inc, y = open_acc, color = home_ownership)) +
+  geom_point(alpha = 0.18, size = 1) +
+  scale_x_log10() +
+  labs(
+    title = "Annual Income vs Open Accounts by Home Ownership",
+    subtitle = "Filtered to Mortgage, Own, Rent, and Other",
+    x = "Annual income (log scale)",
+    y = "Number of open accounts",
+    color = "Home ownership"
+  ) +
+  theme_minimal()
+```
+
+I added `home_ownership` as a third variable because it may help explain the relationship between `annual_inc` and `open_acc` more clearly. Since home ownership is related to a borrower’s financial situation, it is useful to see whether the groups appear in different parts of the plot.
+
+I included only the categories `MORTGAGE`, `OWN`, `RENT`, and `OTHER`, because the `ANY` and `NONE` categories contain only a very small number of observations and would not contribute much to the interpretation.
+
+The plot shows that the groups are not distributed completely evenly. `MORTGAGE` observations appear more often at higher income levels, while `RENT` observations are more common at lower income levels. This gives additional insight, because it suggests that part of the overall pattern between `annual_inc` and `open_acc` may be related to differences in home ownership groups.
+
+However, the groups still overlap a lot, so `home_ownership` does not create a strong separation. It only adds some extra context to the weak overall relationship.
 
 ## Selected Insight 2
 
 ### Variable Pair: `home_ownership` vs `annual_inc`
+
+### Why This Pair Is Interesting
+
+The combination of `annual_inc` and `home_ownership` is interesting because the pair plot suggests that annual income may vary between home ownership groups. This makes the pair worth exploring further, since home ownership is related to a borrower’s financial situation.
+
+A separate plot can help show the differences between the groups more clearly and make it easier to compare their income distributions.
 
 ### Stand-alone Professional Plot
 
@@ -399,8 +446,4 @@ ggplot(
 
 ### Interpretation
 
-> home ownership and annual income were analyzed using a boxplot to compare income distributions across different housing situations. To make interpretation easier the categories OTHER, ANY, None have been removed since it is not relevant and they appear at most just a dozen times together. 
-The plot shows that individuals with a mortgage have the highest median annual income (≈73,000). This is noticeably higher than both homeowners without a mortgage (≈56,000) and renters (≈55,000).
-A explanation could be that people who take on a mortgage often have higher and more stable incomes, since banks require sufficient income to approve a mortgage.
-Surprising is, that individuals who own their home have a similar income distribution to renters, with almost identical median incomes.A explanation could be that typically elderly people own their own home because they had more time to pay off their debt. this means that they just receive their rent, which is usually lower than a normal income (atleast in switzerland)
-Overall, the boxplot suggests that having a mortgage is associated with higher income, while owning a home outright does not necessarily imply higher current income compared to renting.
+> home ownership and annual income were analyzed using a boxplot to compare income distributions across different housing situations. To make interpretation easier the categories OTHER, ANY, None have been removed since it is not relevant and they appear at most just a dozen times together. The plot shows that individuals with a mortgage have the highest median annual income (≈73,000). This is noticeably higher than both homeowners without a mortgage (≈56,000) and renters (≈55,000). A explanation could be that people who take on a mortgage often have higher and more stable incomes, since banks require sufficient income to approve a mortgage. Surprising is, that individuals who own their home have a similar income distribution to renters, with almost identical median incomes.A explanation could be that typically elderly people own their own home because they had more time to pay off their debt. this means that they just receive their rent, which is usually lower than a normal income (atleast in switzerland) Overall, the boxplot suggests that having a mortgage is associated with higher income, while owning a home outright does not necessarily imply higher current income compared to renting.
