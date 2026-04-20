@@ -1,0 +1,67 @@
+---
+title: "TSAR Project Part 2 – Data Wrangling with dplyr and tidyr"
+author: "Kryštof Vávra, Said Fakhri (Group 03)"
+date: today
+format:
+  pdf:
+    number-sections: true
+editor: visual
+---
+```{r}
+#| label: setup
+#| include: false
+#| message: false
+#| warning: false
+
+if (!require("data.table")) install.packages("data.table")
+if (!require("DataExplorer")) install.packages("DataExplorer")
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("tidyr")) install.packages("tidyr")
+# if (!require("skimr")) install.packages("skimr")
+# if (!require("ggplot2")) install.packages("ggplot2")
+# if (!require("GGally")) install.packages("GGally")
+
+library(data.table)
+library(DataExplorer)
+library(dplyr)
+library(tidyr)
+#library(skimr)
+#library(ggplot2)
+#library(GGally)
+```
+
+# Task 1
+## Data Loaded
+```{r}
+myLCdata <- fread("myLCdata.csv")
+```
+
+## Data dirtyfied
+```{r}
+#| label: apply-dirtyfy
+#| message: false
+#| warning: false
+
+dirtyfy <- readRDS("dirtyfy.rds")
+myLCdata_dirty <- dirtyfy(myLCdata, 3)
+```
+
+## Automatic EDA report
+
+The following command was used to generate an automatic EDA report for `myLCdata_dirty`. As required, it was executed in the R console and is shown here only for documentation purposes.
+
+```{r}
+#| eval: false
+
+create_report(myLCdata_dirty, output_file = "EDA_report_P2_03.html")
+```
+
+## Missing Data Profile
+
+Figure 1 shows the Missing Data Profile generated from the dirty private data set.
+
+```{r}
+#| echo: false
+#| fig-cap: "Missing Data Profile of the dirty private data set."
+knitr::include_graphics("missing_data_profile.png")
+```
