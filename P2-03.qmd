@@ -41,9 +41,11 @@ myLCdata <- fread("myLCdata.csv")
 #| label: apply-dirtyfy
 #| message: false
 #| warning: false
-
-dirtyfy <- readRDS("dirtyfy.rds")
-myLCdata_dirty <- dirtyfy(myLCdata, 3)
+# Dirtyfy data and store it so we work with the same dirtyfy data
+# dirtyfy <- readRDS("dirtyfy.rds")
+# myLCdata_dirty <- dirtyfy(myLCdata, 3)
+# fwrite(myLCdata_dirty, file = "myLCdata_dirty.csv")
+myLCdata_dirty <- fread("myLCdata_dirty.csv")
 ```
 
 ## Automatic EDA report
