@@ -18,7 +18,7 @@ if (!require("DataExplorer")) install.packages("DataExplorer")
 if (!require("dplyr")) install.packages("dplyr")
 if (!require("tidyr")) install.packages("tidyr")
 # if (!require("skimr")) install.packages("skimr")
-# if (!require("ggplot2")) install.packages("ggplot2")
+if (!require("ggplot2")) install.packages("ggplot2")
 # if (!require("GGally")) install.packages("GGally")
 
 library(data.table)
@@ -26,7 +26,7 @@ library(DataExplorer)
 library(dplyr)
 library(tidyr)
 #library(skimr)
-#library(ggplot2)
+library(ggplot2)
 #library(GGally)
 ```
 
@@ -67,3 +67,15 @@ Figure 1 shows the Missing Data Profile generated from the dirty private data se
 #| fig-cap: "Missing Data Profile of the dirty private data set."
 knitr::include_graphics("missing_data_profile.png")
 ```
+# Task 2
+
+## Special values in character attributes
+```{r}
+
+```
+
+
+
+
+
+
