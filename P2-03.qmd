@@ -80,22 +80,25 @@ knitr::include_graphics("missing_data_profile.png")
 ```{r}
 summary(myLCdata_dirty)
 ```
-First We count special values for character features
-### All columns
-#### Number of NA
+
+First We count special values for character features \### All columns \#### Number of NA
+
 ```{r}
 num_na <- myLCdata_dirty %>% summarize(across(everything(), ~sum(is.na(.))))
 num_na
 ```
 
 ### Numeric Columns
+
 #### Number of NaN
+
 ```{r}
 num_nan <- myLCdata_dirty %>% summarize(across(where(is.numeric), ~sum(is.nan(.))))
 num_nan
 ```
 
 #### Number of Outliers
+
 ```{r}
 # Normal way
 num_outliers <- myLCdata_dirty %>% summarize(across(where(is.numeric), ~length(boxplot.stats(.)$out)))
@@ -109,7 +112,9 @@ num_outliers
 ```
 
 ### Character Columns
+
 #### Special Strings "n/a"
+
 ```{r}
 
 num_na_string <- myLCdata_dirty %>% summarize(across(where(is.character), ~sum(
@@ -119,6 +124,7 @@ num_na_string
 ```
 
 #### Special Strings Space " "
+
 ```{r}
 
 num_white_space <- myLCdata_dirty %>% summarize(across(where(is.character), ~sum(
@@ -128,6 +134,7 @@ num_white_space
 ```
 
 #### Special Strings Empty String ""
+
 ```{r}
 
 num_empty_string <- myLCdata_dirty %>% summarize(across(where(is.character), ~sum(
@@ -137,5 +144,127 @@ num_empty_string
 ```
 
 
+##Task2.2
 
+```{r}
+#total number of rows
+total_rows = sapply(myLCdata_dirty, length)
+
+#summing up the special values
+
+total_special = bind_rows(num_na, num_nan, num_outliers, num_na_string, num_white_space, num_empty_string) %>%
+  summarise(across(everything(), ~sum(., na.rm = TRUE)))
+
+relative_counts = total_special / total_rows
+
+relative_counts
+
+
+```
+
+##Task 2.3
+
+###numeric attributes
+
+```{r}
+# Total rows
+num_total = nrow(myLCdata_dirty)
+
+# numeric_na metric
+numeric_na = myLCdata_dirty %>% summarize(across(where(is.numeric), ~sum(is.na(.))))
+
+# table
+numeric_result_table = data.frame(
+  attribute     = names(numeric_na),
+  perc_NA       = as.numeric(numeric_na / num_total),
+  perc_NaN      = as.numeric(num_nan / num_total),
+  perc_outliers = as.numeric(num_outliers / num_total)
+)
+
+numeric_result_table
+
+```
+
+
+###character attribute
+```{r}
+
+# character_na metric
+character_na = myLCdata_dirty %>% summarize(across(where(is.character), ~sum(is.na(.))))
+
+#character table
+character_result_table = data.frame(
+  attribute = names(character_na),
+  perc_NA = as.numeric(character_na / num_total),
+  perc_empty_string = as.numeric(num_empty_string / num_total),
+  perc_space = as.numeric(num_white_space / num_total),
+  perc_na_string = as.numeric(num_na_string / num_total)
+)
+
+character_result_table
+
+
+
+
+```
+
+##Task 2.4
+
+```{r}
+
+#numeric tidy table
+
+tidy_numeric_result_table = numeric_result_table %>%
+  pivot_longer(
+    cols = starts_with("perc_"),
+    names_to = "metric",
+    values_to = "value"
+  )
+tidy_numeric_result_table
+
+#character tidy table
+
+tidy_character_result_table = character_result_table %>%
+  pivot_longer(
+    cols = starts_with("perc_"),
+    names_to = "metric",
+    values_to = "value"
+  )
+
+tidy_character_result_table
+```
+
+##Task 2.5
+
+###numeric table
+```{r}
+
+ggplot(tidy_numeric_result_table, aes(x = attribute, y = value, fill = metric)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Numeric Variables Quality Metrics",
+    x = "Attribute",
+    y = "Proportion",
+    fill = "Metric"
+  ) +
+  scale_y_continuous(labels = scales::percent)+
+  coord_flip()
+```
+
+###character table
+
+```{r}
+ggplot(tidy_character_result_table, aes(x= attribute, y = value, fill = metric))+
+  geom_col(position = "dodge")+
+  labs(
+    title = "Character Variables Quality Metrics",
+    x = "Attribute",
+    y = "Proportion"
+    )+
+  coord_flip()+
+  scale_y_continuous(labels = scales::percent)
+  
+
+
+```
 
