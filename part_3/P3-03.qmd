@@ -1,0 +1,291 @@
+---
+title: "TSAR Project Part 3 – Times Series Forecasting"
+author: "Kryštof Vávra, Said Fakhri (Group 03)"
+date: today
+format:
+  pdf:
+    number-sections: true
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| include: false
+#| message: false
+#| warning: false
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("tidyr")) install.packages("tidyr")
+if (!require("fpp3")) install.packages("fpp3")
+
+library(dplyr)
+library(tidyr)
+library(fpp3)
+```
+
+# Load Data
+
+## Data Loaded
+
+```{r}
+mySeries <- readRDS("employment_series_CEU1000000001.rds")
+```
+
+# Train 2 different benchmark models
+
+## The seasonal naive method (see Part 2, Lecture 3)
+### Extract Training Set
+
+The number of rows in the time series is counted using `nrow()`. Then 80% of the rows are calculated and rounded down with `floor()`. The first 80% of the observations are extracted with `slice()` and stored as the training set in the variable `train`. The remaining 20% are not extracted separately, but their length is stored for later forecasting.
+
+```{r}
+#| label: extract-training-set
+
+# Count total number of rows
+n_total <- nrow(mySeries)
+
+# Calculate the number of rows for the training set
+n_train <- floor(n_total * 0.8)
+
+# Calculate the length of the remaining test period
+test_length <- n_total - n_train
+
+# Extract the first 80% of rows as the training set
+train <- mySeries %>%
+  slice(1:n_train)
+
+# Show the calculated values
+n_total
+n_train
+test_length
+
+# Inspect the training set
+train
+```
+### Train your 1st Benchmark Model
+
+The first benchmark model is the seasonal naive method. This model is useful for monthly time series because it forecasts each future value using the value from the same month in the previous year. The model is trained on the training set using `model()`. The function `augment()` is then used to inspect the fitted values and residuals.
+
+```{r}
+#| label: train-seasonal-naive-model
+
+# Train the first benchmark model: seasonal naive
+model_snaive <- train %>%
+  model(
+    seasonal_naive = SNAIVE(Employed)
+  )
+
+# Show the trained model
+model_snaive
+
+```
+### Inspect Fitted Values of the 1st Benchmark Model
+
+The fitted values are inspected using `augment()`. The first fitted values may be missing because the seasonal naive method needs observations from the previous season before it can produce fitted values.
+
+```{r}
+#| label: inspect-seasonal-naive-fitted-values
+
+# Get fitted values and residuals
+augmented_snaive <- augment(model_snaive)
+
+# Inspect fitted values
+augmented_snaive
+```
+
+```{r}
+#| label: view-seasonal-naive-augmented
+
+View(augmented_snaive)
+```
+
+### Evaluate Model Fit of 1st Benchmark Model: Actual vs. Fitted Time Plot
+
+The model fit is first evaluated by comparing the actual values of the training set with the fitted values produced by the seasonal naive benchmark model.
+
+```{r}
+#| label: actual-vs-fitted-time-plot-snaive
+
+# Get fitted values and residuals from the seasonal naive model
+augmented_snaive <- augment(model_snaive)
+
+# Plot actual values and fitted values in the same time plot
+augmented_snaive %>%
+  autoplot(Employed) +
+  autolayer(augmented_snaive, .fitted) +
+  labs(
+    title = "Actual vs. Fitted Values: Seasonal Naive Model",
+    x = "Time",
+    y = "Employment"
+  )
+```
+
+**Are the fitted values close to the actual values?**  
+The fitted values follow the general movement of the actual values, but they do not match them perfectly.
+
+**Are they systematically too high or too low?**  
+The fitted values are systematically too low during increasing periods and too high during decreasing periods.
+
+**If yes, where does it come from?**
+
+This happens because the seasonal naive method uses the value from the same month in the previous year, so it reacts with a one-year delay. (In documentation it is stated that without lag specification the seasonal interval is 1 year for monthly data.)
+
+### Actual vs. Fitted Scatter Plot
+
+The actual values are plotted against the fitted values to check how close the fitted values are to the actual observations. The dashed identity line represents perfect predictions, where fitted values would be exactly equal to actual values.
+
+```{r}
+#| label: actual-vs-fitted-scatter-snaive
+
+augmented_snaive %>%
+  filter(!is.na(.fitted)) %>%
+  ggplot(aes(x = .fitted, y = Employed)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, linetype = 2) +
+  labs(
+    title = "Actual vs. Fitted Values: Seasonal Naive Model",
+    x = "Fitted values",
+    y = "Actual values"
+  )
+```
+**Are the points close to the identity line?**  
+Many points are close to the identity line, especially at lower employment levels, but the spread becomes much larger at higher employment levels.
+
+**Are they systematically too high or too low?**  
+There is no constant overestimation or underestimation across the whole plot, but the model shows larger errors during periods where the employment level changes more.
+
+**If yes, where does it come from?**  
+The larger errors occur because the seasonal naive model uses values from the same month in the previous year, so it reacts with a one-year delay when employment changes suddenly.
+
+### Residual Diagnostics
+
+The residuals of the seasonal naive model are inspected using `gg_tsresiduals()`. A good forecasting model should have residuals with no clear autocorrelation and a mean close to zero.
+
+
+```{r}
+#| label: residual-diagnostics-snaive
+
+model_snaive %>%
+  gg_tsresiduals()
+```
+
+**Are the residuals auto-correlated? How do you decide that based on the plots?**  
+Yes, the residuals are auto-correlated because the ACF plot shows several significant spikes outside the blue significance bounds. The model does not capture the short term dependence in the data. (all outside the significance line is lag<12)
+
+**Do the residuals have zero mean? How do you decide that based on the plots?**  
+The residuals appear to be roughly centered around zero because the histogram is concentrated around zero and the residual time plot fluctuates around zero, although some outliers are visible and that could influence the mean. We cannot be 100% sure jsut from the plot.
+
+**What do these results tell you about your model?**  
+The seasonal naive model captures part of the yearly seasonal pattern, but the autocorrelation in the residuals shows that important short-term patterns remain unexplained.
+
+
+### Double-check Residual Diagnostics
+
+The residual diagnostics are double-checked using the Ljung-Box test for residual autocorrelation and by calculating the mean of the residuals. Since the data is monthly and the seasonal period is 12 months, a lag of 24 is used for the Ljung-Box test.
+
+```{r}
+#| label: double-check-residual-diagnostics-snaive
+
+# Ljung-Box test for residual autocorrelation
+lb_snaive <- augmented_snaive %>%
+  features(.resid, ljung_box, lag = 24, dof = 0)
+
+lb_snaive
+
+# Calculate residual mean
+residual_mean_snaive <- mean(augmented_snaive$.resid, na.rm = TRUE)
+
+residual_mean_snaive
+
+```
+**Does the Ljung-Box test support your conclusions from the residual plots? How do you conclude that from the test result?**  
+Yes, the Ljung-Box test supports the conclusion that the residuals are autocorrelated, because the p-value is effectively 0, which is below 0.05, so the null hypothesis of no residual autocorrelation is rejected.
+
+**Does the residual mean support your conclusions from the residual plots?**  
+Yes, the residual mean is -4.44, which is very close to zero compared with the employment values, so it supports the conclusion that the residuals are roughly centered around zero.
+
+### Evaluate Point Forecast Accuracy of 1st Benchmark Model
+
+The trained seasonal naive model is used to forecast the remaining 20% of the time series. The forecast horizon is set to `test_length`, which is the number of observations not included in the training set.
+
+```{r}
+#| label: forecast-seasonal-naive
+
+# Create forecast for the same length as the test period
+fc_snaive <- model_snaive %>%
+  forecast(h = test_length)
+
+# Inspect forecast
+fc_snaive
+```
+
+### Actual vs. Forecast Time Plot
+
+The forecast values are plotted together with the original time series to visually compare the predicted values with the actual observations in the test period.
+
+```{r}
+#| label: actual-vs-forecast-snaive
+
+fc_snaive %>%
+  autoplot(mySeries) +
+  labs(
+    title = "Actual vs. Forecast: Seasonal Naive Model",
+    x = "Time",
+    y = "Employment"
+  )
+```
+
+### Forecast Accuracy Metrics
+
+The point forecast accuracy is evaluated using accuracy metrics. The two main metrics interpreted here are RMSE and MAPE.
+
+```{r}
+#| label: forecast-accuracy-snaive
+
+accuracy_snaive <- fc_snaive %>%
+  accuracy(mySeries)
+
+accuracy_snaive
+```
+
+**Actual vs. Forecast interpretation:**  
+The seasonal naive forecast does not capture the strong increase in the test period. The forecast mostly repeats the seasonal pattern from the end of the training data, but the real employment values increase much more. This means that the model works as a simple benchmark, but it struggles when the series changes strongly and the future trend is different from the past pattern.
+
+**RMSE interpretation:**  
+The RMSE of the seasonal naive model is 183.68. Since RMSE is scale-dependent, it must be interpreted relative to the employment level of the series. Looking at the time plot, this error is large because the model underestimates the actual values in the test period.
+
+**MAPE interpretation:**  
+The MAPE of the seasonal naive model is 20.78%. This means that, on average, the forecast error is about 20.78% of the actual employment level. This is quite high for a point forecast and confirms that the seasonal naive model is not very accurate for this test period.
+
+### Evaluate Point Forecast Uncertainty of 1st Benchmark Model
+
+The forecast uncertainty is evaluated by checking whether the residuals satisfy the assumptions needed for reliable prediction intervals. The same residual diagnostics as before are used, but the focus is now on constant variance and normality.
+
+```{r}
+#| label: uncertainty-residual-diagnostics-snaive
+
+model_snaive %>%
+  gg_tsresiduals()
+```
+
+**Are the residuals homoscedastic?**  
+No, the residuals do not appear to have constant variance because some periods show much larger residual fluctuations than others.
+
+**Are the residuals normally distributed?**  
+No, the residuals are not perfectly normally distributed. Yes it is mostly symmetric and bell-shaped around zero, but it has big tails with distinct outliers. Especially around -400 and +300. So it approximates normality around 0 I need to say no because of the outliers.
+
+### Prediction Interval Boundaries
+
+The prediction interval boundaries are displayed using `hilo()`. This shows the lower and upper bounds of the 80% and 95% prediction intervals for each forecasted month.
+
+```{r}
+#| label: prediction-intervals-snaive-clean
+
+fc_snaive %>%
+  hilo(level = c(80, 95)) %>%
+  select(Month, .mean, `80%`, `95%`)
+```
+
+**Does it make sense to include these prediction intervals in the model evaluation?**  
+The prediction intervals should only be interpreted with caution because the residuals are autocorrelated, not clearly homoscedastic, and not normally distributed, so the intervals are not that reliable.
+
+## <Second model> Said select a second model and start here

@@ -58,7 +58,6 @@ The following command was used to generate an automatic EDA report for `myLCdata
 
 ```{r}
 #| eval: false
-#| echo: false
 #| 
 create_report(myLCdata_dirty, output_file = "EDA_report_P2_03.html")
 ```
