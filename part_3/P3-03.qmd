@@ -1,5 +1,5 @@
 ---
-title: "TSAR Project Part 3 – Times Series Forecasting"
+title: "TSAR Project Part 3 - Times Series Forecasting"
 author: "Kryštof Vávra, Said Fakhri (Group 03)"
 date: today
 format:
@@ -28,11 +28,19 @@ library(fpp3)
 
 ```{r}
 mySeries <- readRDS("employment_series_CEU1000000001.rds")
+
+#Quick summary
+summary(mySeries)
+
+#Check for NAs
+sum(is.na(mySeries))
+
 ```
 
 # Train 2 different benchmark models
 
 ## The seasonal naive method (see Part 2, Lecture 3)
+
 ### Extract Training Set
 
 The number of rows in the time series is counted using `nrow()`. Then 80% of the rows are calculated and rounded down with `floor()`. The first 80% of the observations are extracted with `slice()` and stored as the training set in the variable `train`. The remaining 20% are not extracted separately, but their length is stored for later forecasting.
@@ -61,6 +69,7 @@ test_length
 # Inspect the training set
 train
 ```
+
 ### Train your 1st Benchmark Model
 
 The first benchmark model is the seasonal naive method. This model is useful for monthly time series because it forecasts each future value using the value from the same month in the previous year. The model is trained on the training set using `model()`. The function `augment()` is then used to inspect the fitted values and residuals.
@@ -78,6 +87,7 @@ model_snaive <- train %>%
 model_snaive
 
 ```
+
 ### Inspect Fitted Values of the 1st Benchmark Model
 
 The fitted values are inspected using `augment()`. The first fitted values may be missing because the seasonal naive method needs observations from the previous season before it can produce fitted values.
@@ -111,7 +121,7 @@ augmented_snaive <- augment(model_snaive)
 # Plot actual values and fitted values in the same time plot
 augmented_snaive %>%
   autoplot(Employed) +
-  autolayer(augmented_snaive, .fitted) +
+  autolayer(augmented_snaive, .fitted, color = "blue", linetype = "dashed")  +
   labs(
     title = "Actual vs. Fitted Values: Seasonal Naive Model",
     x = "Time",
@@ -119,10 +129,10 @@ augmented_snaive %>%
   )
 ```
 
-**Are the fitted values close to the actual values?**  
+**Are the fitted values close to the actual values?**\
 The fitted values follow the general movement of the actual values, but they do not match them perfectly.
 
-**Are they systematically too high or too low?**  
+**Are they systematically too high or too low?**\
 The fitted values are systematically too low during increasing periods and too high during decreasing periods.
 
 **If yes, where does it come from?**
@@ -139,7 +149,7 @@ The actual values are plotted against the fitted values to check how close the f
 augmented_snaive %>%
   filter(!is.na(.fitted)) %>%
   ggplot(aes(x = .fitted, y = Employed)) +
-  geom_point() +
+  geom_point(color = "blue") +
   geom_abline(slope = 1, intercept = 0, linetype = 2) +
   labs(
     title = "Actual vs. Fitted Values: Seasonal Naive Model",
@@ -147,19 +157,19 @@ augmented_snaive %>%
     y = "Actual values"
   )
 ```
-**Are the points close to the identity line?**  
+
+**Are the points close to the identity line?**\
 Many points are close to the identity line, especially at lower employment levels, but the spread becomes much larger at higher employment levels.
 
-**Are they systematically too high or too low?**  
+**Are they systematically too high or too low?**\
 There is no constant overestimation or underestimation across the whole plot, but the model shows larger errors during periods where the employment level changes more.
 
-**If yes, where does it come from?**  
+**If yes, where does it come from?**\
 The larger errors occur because the seasonal naive model uses values from the same month in the previous year, so it reacts with a one-year delay when employment changes suddenly.
 
 ### Residual Diagnostics
 
 The residuals of the seasonal naive model are inspected using `gg_tsresiduals()`. A good forecasting model should have residuals with no clear autocorrelation and a mean close to zero.
-
 
 ```{r}
 #| label: residual-diagnostics-snaive
@@ -168,15 +178,14 @@ model_snaive %>%
   gg_tsresiduals()
 ```
 
-**Are the residuals auto-correlated? How do you decide that based on the plots?**  
-Yes, the residuals are auto-correlated because the ACF plot shows several significant spikes outside the blue significance bounds. The model does not capture the short term dependence in the data. (all outside the significance line is lag<12)
+**Are the residuals auto-correlated? How do you decide that based on the plots?**\
+Yes, the residuals are auto-correlated because the ACF plot shows several significant spikes outside the blue significance bounds. The model does not capture the short term dependence in the data. (all outside the significance line is lag < 12)
 
-**Do the residuals have zero mean? How do you decide that based on the plots?**  
-The residuals appear to be roughly centered around zero because the histogram is concentrated around zero and the residual time plot fluctuates around zero, although some outliers are visible and that could influence the mean. We cannot be 100% sure jsut from the plot.
+**Do the residuals have zero mean? How do you decide that based on the plots?**\
+The residuals appear to be roughly centered around zero because the histogram is concentrated around zero and the residual time plot fluctuates around zero, although some outliers are visible and that could influence the mean. We cannot be 100% sure just from the plot.
 
-**What do these results tell you about your model?**  
+**What do these results tell you about your model?**\
 The seasonal naive model captures part of the yearly seasonal pattern, but the autocorrelation in the residuals shows that important short-term patterns remain unexplained.
-
 
 ### Double-check Residual Diagnostics
 
@@ -197,10 +206,11 @@ residual_mean_snaive <- mean(augmented_snaive$.resid, na.rm = TRUE)
 residual_mean_snaive
 
 ```
-**Does the Ljung-Box test support your conclusions from the residual plots? How do you conclude that from the test result?**  
+
+**Does the Ljung-Box test support your conclusions from the residual plots? How do you conclude that from the test result?**\
 Yes, the Ljung-Box test supports the conclusion that the residuals are autocorrelated, because the p-value is effectively 0, which is below 0.05, so the null hypothesis of no residual autocorrelation is rejected.
 
-**Does the residual mean support your conclusions from the residual plots?**  
+**Does the residual mean support your conclusions from the residual plots?**\
 Yes, the residual mean is -4.44, which is very close to zero compared with the employment values, so it supports the conclusion that the residuals are roughly centered around zero.
 
 ### Evaluate Point Forecast Accuracy of 1st Benchmark Model
@@ -247,13 +257,13 @@ accuracy_snaive <- fc_snaive %>%
 accuracy_snaive
 ```
 
-**Actual vs. Forecast interpretation:**  
+**Actual vs. Forecast interpretation:**\
 The seasonal naive forecast does not capture the strong increase in the test period. The forecast mostly repeats the seasonal pattern from the end of the training data, but the real employment values increase much more. This means that the model works as a simple benchmark, but it struggles when the series changes strongly and the future trend is different from the past pattern.
 
-**RMSE interpretation:**  
+**RMSE interpretation:**\
 The RMSE of the seasonal naive model is 183.68. Since RMSE is scale-dependent, it must be interpreted relative to the employment level of the series. Looking at the time plot, this error is large because the model underestimates the actual values in the test period.
 
-**MAPE interpretation:**  
+**MAPE interpretation:**\
 The MAPE of the seasonal naive model is 20.78%. This means that, on average, the forecast error is about 20.78% of the actual employment level. This is quite high for a point forecast and confirms that the seasonal naive model is not very accurate for this test period.
 
 ### Evaluate Point Forecast Uncertainty of 1st Benchmark Model
@@ -267,10 +277,10 @@ model_snaive %>%
   gg_tsresiduals()
 ```
 
-**Are the residuals homoscedastic?**  
+**Are the residuals homoscedastic?**\
 No, the residuals do not appear to have constant variance because some periods show much larger residual fluctuations than others.
 
-**Are the residuals normally distributed?**  
+**Are the residuals normally distributed?**\
 No, the residuals are not perfectly normally distributed. Yes it is mostly symmetric and bell-shaped around zero, but it has big tails with distinct outliers. Especially around -400 and +300. So it approximates normality around 0 I need to say no because of the outliers.
 
 ### Prediction Interval Boundaries
@@ -285,7 +295,234 @@ fc_snaive %>%
   select(Month, .mean, `80%`, `95%`)
 ```
 
-**Does it make sense to include these prediction intervals in the model evaluation?**  
+**Does it make sense to include these prediction intervals in the model evaluation?**\
 The prediction intervals should only be interpreted with caution because the residuals are autocorrelated, not clearly homoscedastic, and not normally distributed, so the intervals are not that reliable.
 
-## <Second model> Said select a second model and start here
+## Second Model: The Drift Method (Said)
+
+### Train your 2nd Benchmark Model
+
+The second benchmark model is the drift method. This model is useful because it captures the long-term trend of a time series. The model is trained on the training set using `model()`. The function `augment()` is then used to inspect the fitted values and residuals.
+
+```{r}
+#| label: train-drift-model
+
+# Train the 2nd benchmark model: drift method
+model_drift <- train %>%
+  model(
+    drift = RW(Employed ~ drift())
+  )
+
+# Show the trained model
+model_drift
+
+```
+
+### Inspect Fitted Values of the 2nd Benchmark Model
+
+The fitted values are inspected using `augment()`. The first fitted value may be missing because the drift method needs observations at least 2 observations (beginning & end)
+
+```{r}
+#| label: inspect-drift-fitted-values
+
+# Get fitted values and residuals
+augmented_drift <- augment(model_drift)
+
+# Inspect fitted values
+augmented_drift
+```
+
+```{r}
+#| label: view-drift-augmented
+
+View(augmented_drift)
+```
+
+### Evaluate Model Fit of 2nd Benchmark Model: Actual vs. Fitted Time Plot
+
+The model fit is first evaluated by comparing the actual values of the training set with the fitted values produced by the drift benchmark model.
+
+```{r}
+#| label: actual-vs-fitted-time-plot-drift
+
+# Get fitted values and residuals from the seasonal naive model
+augmented_drift <- augment(model_drift)
+
+# Plot actual values and fitted values in the same time plot
+augmented_drift %>%
+  autoplot(Employed) +
+  autolayer(augmented_drift, .fitted, color = "blue", linetype = "dashed")  +
+  labs(
+    title = "Actual vs. Fitted Values: Drift Model",
+    x = "Time",
+    y = "Employment"
+  )
+```
+
+**Are the fitted values close to the actual values?**\
+The fitted values are very close to the general movement of the actual values, but they do not match them perfectly.
+
+**Are they systematically too high or too low?**\
+The fitted values are just a little too low during increasing periods anda little too high during decreasing periods.
+
+**If yes, where does it come from?**\
+This happens because the drift method uses the value from the beginning until a observations prior, so it reacts with a a leg delay.
+
+### Actual vs. Fitted Scatter Plot
+
+The actual values are plotted against the fitted values to check how close the fitted values are to the actual observations. The blue dashed identity line represents perfect predictions, where fitted values would be exactly equal to actual values.
+
+```{r}
+#| label: actual-vs-fitted-scatter-drive
+
+augmented_drift %>%
+  filter(!is.na(.fitted)) %>%
+  ggplot(aes(x = .fitted, y = Employed)) +
+  geom_point(color = "blue") +
+  geom_abline(slope = 1, intercept = 0, linetype = 2) +
+  labs(
+    title = "Actual vs. Fitted Values: Drift Model",
+    x = "Fitted values",
+    y = "Actual values"
+  )
+```
+
+**Are the points close to the identity line?**\
+Many points are very close to the identity line. There are outliers especially at the low and middle level of employment. At the low level of employment there more outliers above the interception line. At the mid level the outliers tend to be under the interception line. The high level of employment does not seem to have outliers. This seems to be because there are in general not many data points with high level of employment.
+
+**Are they systematically too high or too low?**\
+There is no constant overestimation or underestimation across the whole plot, but the model shows small errors at the low- and mid level employement.
+
+**If yes, where does it come from?**\
+Not applicable
+
+### Residual Diagnostics
+
+The residuals of the drift model are inspected using `gg_tsresiduals()`. A good forecasting model should have residuals with no clear autocorrelation and a mean close to zero.
+
+```{r}
+#| label: residual-diagnostics-drift
+
+model_drift %>%
+  gg_tsresiduals()
+```
+
+**Are the residuals auto-correlated? How do you decide that based on the plots?**\
+No, the residuals does not seem to be auto-correlated because the ACF plot shows 2 significant spikes outside the blue significance bounds.
+
+**Do the residuals have zero mean? How do you decide that based on the plots?**\
+The residuals appear to be roughly centered around zero because the histogram is concentrated around zero and the residual time plot fluctuates around zero, although some outliers are visible and that could influence the mean. We cannot be 100% sure just from the plot.
+
+**What do these results tell you about your model?**\
+The drift model seems to captures most of the pattern.
+
+### Double-check Residual Diagnostics
+
+The residual diagnostics are double-checked using the Ljung-Box test for residual autocorrelation and by calculating the mean of the residuals. Since the data is monthly and the seasonal period is 12 months, a lag of 24 is used for the Ljung-Box test.
+
+```{r}
+#| label: double-check-residual-diagnostics-drift
+
+# Ljung-Box test for residual autocorrelation
+lb_drift <- augmented_drift %>%
+  features(.resid, ljung_box, lag = 24, dof = 0)
+
+lb_drift
+
+# Calculate residual mean
+residual_mean_drift <- mean(augmented_drift$.resid, na.rm = TRUE)
+
+residual_mean_drift
+
+```
+
+**Does the Ljung-Box test support your conclusions from the residual plots? How do you conclude that from the test result?**\
+No, the Ljung-Box test does not supports the conclusion that the residuals are not autocorrelated, because the p-value is effectively 0, which is below 0.05, so the null hypothesis of no residual autocorrelation is not rejected.
+
+**Does the residual mean support your conclusions from the residual plots?**\
+Yes, the residual mean very close to 0 compared with the employment values, so it supports the conclusion that the residuals are roughly centered around zero.
+
+### Evaluate Point Forecast Accuracy of 1st Benchmark Model
+
+The trained seasonal naive model is used to forecast the remaining 20% of the time series. The forecast horizon is set to `test_length`, which is the number of observations not included in the training set.
+
+```{r}
+#| label: forecast-seasonal-drift
+
+# Create forecast for the same length as the test period
+fc_drift <- model_drift %>%
+  forecast(h = test_length)
+
+# Inspect forecast
+fc_drift
+```
+
+### Actual vs. Forecast Time Plot
+
+The forecast values are plotted together with the original time series to visually compare the predicted values with the actual observations in the test period.
+
+```{r}
+#| label: actual-vs-forecast-drift
+
+fc_drift %>%
+  autoplot(mySeries) +
+  labs(
+    title = "Actual vs. Forecast: Drift Model",
+    x = "Time",
+    y = "Employment"
+  )
+```
+
+### Forecast Accuracy Metrics
+
+The point forecast accuracy is evaluated using accuracy metrics. The two main metrics interpreted here are RMSE and MAPE.
+
+```{r}
+#| label: forecast-accuracy-drift
+
+accuracy_drift <- fc_drift %>%
+  accuracy(mySeries)
+
+accuracy_drift
+```
+
+**Actual vs. Forecast interpretation:**\
+The drift forecast does not capture the increase in the test period. The forecast has a downwards slope because for the forecasting only the values at the beginning of the train time series and the end of the train time series were used for the capturing the trend of the time series, which created a sinking slope, which did not capture the shortterm increasing trend in the test time series. But the forecast lays in the 80% of the prediction interval, which suggests that the forecast is not that far from the actual data points.
+
+**RMSE interpretation:**\
+The RMSE of the drift model is 190.73. Since RMSE is scale-dependent, it must be interpreted relative to the employment level of the series. Looking at the time plot, this error is large because the model underestimates the actual values in the test period.
+
+**MAPE interpretation:**\
+The MAPE of the seasonal naive model is 191.29%. This means that, on average, the forecast error is about 191.29% of the actual employment level. This is quite high for a point forecast and confirms that the drift model is not very accurate for this test period.
+
+### Evaluate Point Forecast Uncertainty of 2nd Benchmark Model
+
+The forecast uncertainty is evaluated by checking whether the residuals satisfy the assumptions needed for reliable prediction intervals. The same residual diagnostics as before are used, but the focus is now on constant variance and normality.
+
+```{r}
+#| label: uncertainty-residual-diagnostics-drift
+
+model_drift %>%
+  gg_tsresiduals()
+```
+
+**Are the residuals homoscedastic?**\
+No, the residuals do not appear to have constant variance because some periods show much larger residual fluctuations than others.
+
+**Are the residuals normally distributed?**\
+Yes, the residuals seem to be normally distributed. It is mostly symmetric and bell-shaped around zero, but it has big tails with distinct outliers. From 0 to 200 the outliers seem to be positive. From -200 onwards the outliers seem to be negative. 
+
+### Prediction Interval Boundaries
+
+The prediction interval boundaries are displayed using `hilo()`. This shows the lower and upper bounds of the 80% and 95% prediction intervals for each forecasted month.
+
+```{r}
+#| label: prediction-intervals-drift-clean
+
+fc_drift %>%
+  hilo(level = c(80, 95)) %>%
+  select(Month, .mean, `80%`, `95%`)
+```
+
+**Does it make sense to include these prediction intervals in the model evaluation?**\
+The prediction intervals should only be interpreted with caution because the residuals are autocorrelated, not clearly homoscedastic, and not normally distributed, so the intervals are not that reliable.
