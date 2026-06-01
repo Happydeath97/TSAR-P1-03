@@ -179,7 +179,7 @@ model_snaive %>%
 ```
 
 **Are the residuals auto-correlated? How do you decide that based on the plots?**\
-Yes, the residuals are auto-correlated because the ACF plot shows several significant spikes outside the blue significance bounds. The model does not capture the short term dependence in the data. (all outside the significance line is lag < 12)
+Yes, the residuals are auto-correlated because the ACF plot shows several significant spikes outside the blue significance bounds. The model does not capture the short term dependence in the data. (all outside the significance line is lag \< 12)
 
 **Do the residuals have zero mean? How do you decide that based on the plots?**\
 The residuals appear to be roughly centered around zero because the histogram is concentrated around zero and the residual time plot fluctuates around zero, although some outliers are visible and that could influence the mean. We cannot be 100% sure just from the plot.
@@ -298,7 +298,7 @@ fc_snaive %>%
 **Does it make sense to include these prediction intervals in the model evaluation?**\
 The prediction intervals should only be interpreted with caution because the residuals are autocorrelated, not clearly homoscedastic, and not normally distributed, so the intervals are not that reliable.
 
-## Second Model: The Drift Method (Said)
+## Second Model: The Drift Method
 
 ### Train your 2nd Benchmark Model
 
@@ -320,7 +320,7 @@ model_drift
 
 ### Inspect Fitted Values of the 2nd Benchmark Model
 
-The fitted values are inspected using `augment()`. The first fitted value may be missing because the drift method needs observations at least 2 observations (beginning & end)
+The fitted values are inspected using `augment()`. The first fitted value is missing (`NA`) because the drift method produces 1-step forecasts, so there is no fitted value for the very first observation.
 
 ```{r}
 #| label: inspect-drift-fitted-values
@@ -360,13 +360,13 @@ augmented_drift %>%
 ```
 
 **Are the fitted values close to the actual values?**\
-The fitted values are very close to the general movement of the actual values, but they do not match them perfectly.
+Yes. The fitted values are very close to the actual values and follow their movement almost exactly.
 
 **Are they systematically too high or too low?**\
-The fitted values are just a little too low during increasing periods anda little too high during decreasing periods.
+No, there is no clear systematic bias. Each fitted value is essentially the previous observation shifted by the small drift. Because the drift coefficient is tiny relative to the level of the series, the fitted line lies almost on top of the actual series.
 
 **If yes, where does it come from?**\
-This happens because the drift method uses the value from the beginning until a observations prior, so it reacts with a a leg delay.
+Not applicable: There is no systematic over or underestimation. The fitted values track the actual values closely. If there is an abrupt change, the fitted have small delay because they cannot anticipate this abrupt change.
 
 ### Actual vs. Fitted Scatter Plot
 
@@ -408,13 +408,13 @@ model_drift %>%
 ```
 
 **Are the residuals auto-correlated? How do you decide that based on the plots?**\
-No, the residuals does not seem to be auto-correlated because the ACF plot shows 2 significant spikes outside the blue significance bounds.
+Yes, the residuals are auto-correlated. The ACF plot shows several spikes clearly outside the blue significance bounds (at the first lags and at lag 12 and 24 and etc.), which is more than the \~5% of spikes we would tolerate by chance for a white-noise series.
 
 **Do the residuals have zero mean? How do you decide that based on the plots?**\
-The residuals appear to be roughly centered around zero because the histogram is concentrated around zero and the residual time plot fluctuates around zero, although some outliers are visible and that could influence the mean. We cannot be 100% sure just from the plot.
+Yes, the residuals appear to be centred around zero: the histogram is concentrated around zero and the residual time plot fluctuates around zero. Some large outliers are visible, but they do not shift the centre noticeably.
 
 **What do these results tell you about your model?**\
-The drift model seems to captures most of the pattern.
+The autocorrelation in the residuals shows that the drift method does not capture all the structure (seasonality & short-term dependence) present in the data. There is still information left in the residuals that a better model could exploit.
 
 ### Double-check Residual Diagnostics
 
@@ -437,17 +437,17 @@ residual_mean_drift
 ```
 
 **Does the Ljung-Box test support your conclusions from the residual plots? How do you conclude that from the test result?**\
-No, the Ljung-Box test does not supports the conclusion that the residuals are not autocorrelated, because the p-value is effectively 0, which is below 0.05, so the null hypothesis of no residual autocorrelation is not rejected.
+Yes, the Ljung-Box test supports the conclusion that the residuals are autocorrelated. The p-value is effectively 0, which is below 0.05, so the null hypothesis of no residual autocorrelation is rejected. This confirms what we saw in the ACF plot.
 
 **Does the residual mean support your conclusions from the residual plots?**\
-Yes, the residual mean very close to 0 compared with the employment values, so it supports the conclusion that the residuals are roughly centered around zero.
+Yes. The residual mean is closely to 0, so it supports the conclusion that the residuals are centred around zero.
 
-### Evaluate Point Forecast Accuracy of 1st Benchmark Model
+### Evaluate Point Forecast Accuracy of 2nd Benchmark Model
 
-The trained seasonal naive model is used to forecast the remaining 20% of the time series. The forecast horizon is set to `test_length`, which is the number of observations not included in the training set.
+The trained drift model is used to forecast the remaining 20% of the time series. The forecast horizon is set to `test_length`, which is the number of observations not included in the training set.
 
 ```{r}
-#| label: forecast-seasonal-drift
+#| label: forecast-drift
 
 # Create forecast for the same length as the test period
 fc_drift <- model_drift %>%
@@ -487,13 +487,13 @@ accuracy_drift
 ```
 
 **Actual vs. Forecast interpretation:**\
-The drift forecast does not capture the increase in the test period. The forecast has a downwards slope because for the forecasting only the values at the beginning of the train time series and the end of the train time series were used for the capturing the trend of the time series, which created a sinking slope, which did not capture the shortterm increasing trend in the test time series. But the forecast lays in the 80% of the prediction interval, which suggests that the forecast is not that far from the actual data points.
+The drift forecast does not capture the development in the test period. The forecast is a straight line with a slightly downward slope, because the drift coefficient is the average change between the first and the last observation of the training set, and over the training set the series declines overall. In the test period, however, the actual employment rises again, so the gap between forecast and actual values widens over the horizon. The actual values stay within the 80% prediction interval, but the point forecast misses the upward trend.
 
 **RMSE interpretation:**\
-The RMSE of the drift model is 190.73. Since RMSE is scale-dependent, it must be interpreted relative to the employment level of the series. Looking at the time plot, this error is large because the model underestimates the actual values in the test period.
+The RMSE of the drift model is 215.80. Since the RMSE is scale-dependent, it must be judged against the size of the values in the series: in the test period the actual employment mean is around 734, so an error of about 216 is roughly 30% of the typical value, which is large. This large error happens because the drift forecast slopes downward while the actual values rise, so the gap between forecast and reality keeps growing the further ahead we forecast.
 
 **MAPE interpretation:**\
-The MAPE of the seasonal naive model is 191.29%. This means that, on average, the forecast error is about 191.29% of the actual employment level. This is quite high for a point forecast and confirms that the drift model is not very accurate for this test period.
+The MAPE of the drift model is 24.78%. This means that, on average, the forecast error is about 24.78% of the actual employment level. This is high for a point forecast and confirms that the drift method is not accurate for this test period. (Note: the mean error ME is +190.73 and the MAE is 191.29 — both positive and almost identical, which shows the model systematically under-forecasts across the whole test period.)
 
 ### Evaluate Point Forecast Uncertainty of 2nd Benchmark Model
 
@@ -507,10 +507,10 @@ model_drift %>%
 ```
 
 **Are the residuals homoscedastic?**\
-No, the residuals do not appear to have constant variance because some periods show much larger residual fluctuations than others.
+No, the residuals do not have constant variance. The residual time plot shows periods with much larger fluctuations than others, so the variance is not stable over time (property 3 is violated).
 
 **Are the residuals normally distributed?**\
-Yes, the residuals seem to be normally distributed. It is mostly symmetric and bell-shaped around zero, but it has big tails with distinct outliers. From 0 to 200 the outliers seem to be positive. From -200 onwards the outliers seem to be negative. 
+Only approximately. The histogram is roughly symmetric and bell-shaped around zero, but it has heavy tails with several distinct outliers on both sides, so the normality assumption (property 4) is questionable.
 
 ### Prediction Interval Boundaries
 
@@ -525,4 +525,23 @@ fc_drift %>%
 ```
 
 **Does it make sense to include these prediction intervals in the model evaluation?**\
-The prediction intervals should only be interpreted with caution because the residuals are autocorrelated, not clearly homoscedastic, and not normally distributed, so the intervals are not that reliable.
+No, not as a reliable measure. The prediction intervals should be interpreted only with strong caution, because the residuals are autocorrelated, not homoscedastic, and only approximately normal. Since the interval width is computed assuming uncorrelated residuals with constant variance (and, by default, normality), these violations mean the intervals are not trustworthy and should not be used to compare the two models.
+
+## Comparison: Seasonal Naive Method vs. Drift Method
+
+### Comparison of the Results
+
+The two models cannot be separated by their model fit: the residual diagnostics came out badly for both so both fail to capture all the structure in the data and we cannot tell from the fit which one is better. For the same reason the prediction intervals of neither model are reliable, so they cannot be used for the comparison either.
+
+The decision therefore rests on point-forecast accuracy on the test set. Here the seasonal naive method is clearly more accurate than the drift method:
+
+| Metric | Seasonal Naive |  Drift |
+|--------|---------------:|-------:|
+| RMSE   |         183.68 | 215.80 |
+| MAPE   |         20.78% | 24.78% |
+
+The seasonal naive method has the lower error on both metrics. This is consistent with the time plots: the drift forecast is a straight line sloping slightly downward, which moves away from the rising actual values, while the seasonal naive forecast at least repeats the yearly seasonal pattern of the data.
+
+### Model of Choice: Seasonal Naive Method
+
+The seasonal naive method has the lower RMSE and the lower MAPE on the test set. Since both models have an equally poor model fit and unreliable prediction intervals, point-forecast accuracy is the deciding criterion. But it should be noted that neither model captures the data well. Among the two, seasonal naive forecasts the test period slightly more accurately.
